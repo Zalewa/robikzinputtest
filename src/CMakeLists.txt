@@ -1,5 +1,7 @@
+# Project setup
 configure_file(version_defs.hpp.in version_defs.hpp)
 
+# Dependencies
 include(FetchContent)
 
 FetchContent_Declare(
@@ -9,6 +11,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(SDL3)
 
+# Main target
 add_executable(
 	robikzinputtest
 	app.cpp
