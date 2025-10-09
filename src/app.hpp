@@ -13,13 +13,20 @@ enum class ExitCode {
 	UNKNOWN_ERROR = 4
 };
 
+struct AppRunResult {
+	ExitCode code;
+	std::string message;
+
+	bool ok() const { return code == ExitCode::OK; }
+};
+
 class App {
 public:
 	App();
 	~App();
 
-	std::pair<ExitCode, std::string> init(int argc, char *argv[]);
-	std::pair<ExitCode, std::string> run();
+	AppRunResult init(int argc, char *argv[]);
+	AppRunResult run();
 
 private:
 	struct D;

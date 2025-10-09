@@ -49,17 +49,17 @@ App::~App()
 	SDL_Quit();
 }
 
-std::pair<ExitCode, std::string> App::init(int argc, char *argv[])
+AppRunResult App::init(int argc, char *argv[])
 {
 	(void)argc;
 	(void)argv;
 
 	// Initialize SDL
 	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK)) {
-		return std::make_pair(
+		return {
 			ExitCode::SDL_INIT_ERROR,
 			std::string("SDL_Init Error: ") + SDL_GetError()
-		);
+		};
 	}
 
 	// Create a window
@@ -69,25 +69,25 @@ std::pair<ExitCode, std::string> App::init(int argc, char *argv[])
 		SDL_WINDOW_RESIZABLE
 	);
 	if (d->window == nullptr) {
-		return std::make_pair(
+		return {
 			ExitCode::WINDOW_INIT_ERROR,
 			std::string("SDL_CreateWindow Error: ") + SDL_GetError()
-		);
+		};
 	}
 
 	// Create a renderer
 	d->renderer = SDL_CreateRenderer(d->window, nullptr);
 	if (d->renderer == nullptr) {
-		return std::make_pair(
+		return {
 			ExitCode::RENDERER_INIT_ERROR,
 			std::string("SDL_CreateRenderer Error: ") + SDL_GetError()
-		);
+		};
 	}
 
 	return {ExitCode::OK, ""};
 }
 
-std::pair<ExitCode, std::string> App::run()
+AppRunResult App::run()
 {
 	std::vector<std::array<uint8_t, 3>> colors = {
 		// {255, 0, 0},   // Red

@@ -7,21 +7,18 @@ int main(int argc, char **argv)
 {
 	using namespace robikzinputtest;
 
-	std::cerr << "hello, world!" << std::endl;
-
+	AppRunResult app_run_result;
 	std::unique_ptr<App> app = std::make_unique<App>();
-	auto [code, msg] = app->init(argc, argv);
-	if (code != ExitCode::OK) {
-		std::cerr << "Error during initialization: " << msg << std::endl;
-		return int(code);
+	app_run_result = app->init(argc, argv);
+	if (!app_run_result.ok()) {
+		std::cerr << "Error during initialization: " << app_run_result.message << std::endl;
+		return int(app_run_result.code);
 	}
 
-	auto runResult = app->run();
-	code = runResult.first;
-	msg = runResult.second;
-	if (code != ExitCode::OK) {
-		std::cerr << "Error during run: " << msg << std::endl;
-		return int(code);
+	app_run_result = app->run();
+	if (!app_run_result.ok()) {
+		std::cerr << "Error during run: " << app_run_result.message << std::endl;
+		return int(app_run_result.code);
 	}
 
 	app.reset();
