@@ -1,4 +1,5 @@
 #include "app.hpp"
+#include "version.hpp"
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_keycode.h>
@@ -63,8 +64,9 @@ AppRunResult App::init(int argc, char *argv[])
 	}
 
 	// Create a window
+	std::string title = "Robikz's Input Test v" + app_version();
 	d->window = SDL_CreateWindow(
-		"Robikz's Input Test",
+		title.c_str(),
 		800, 600,
 		SDL_WINDOW_RESIZABLE
 	);
