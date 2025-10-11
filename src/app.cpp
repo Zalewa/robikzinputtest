@@ -1,4 +1,5 @@
 #include "app.hpp"
+#include "clock.hpp"
 #include "version.hpp"
 
 #include <SDL3/SDL.h>
@@ -29,6 +30,8 @@ struct App::D
 {
 	SDL_Window* window;
 	SDL_Renderer* renderer;
+
+	EngineClock clock;
 
 	D() : window(nullptr), renderer(nullptr)
 	{
@@ -81,11 +84,12 @@ AppRunResult App::init(int argc, char *argv[])
 AppRunResult App::run()
 {
 	while (1) {
-		const AppRunResult event_result = handleEvents();
+		FrameTime frame_time = d->clock.tick();
+		const AppRunResult event_result = handleEvents(frame_time);
 		if (event_result != AppRunResult::CONTINUE) {
 			return event_result;
 		}
-		const AppRunResult iterate_result = iterate();
+		const AppRunResult iterate_result = iterate(frame_time);
 		if (iterate_result != AppRunResult::CONTINUE) {
 			return iterate_result;
 		}
@@ -93,8 +97,10 @@ AppRunResult App::run()
 	return AppRunResult::SUCCESS;
 }
 
-AppRunResult App::handleEvents()
+AppRunResult App::handleEvents(const FrameTime &frame_time)
 {
+	(void) frame_time;
+
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		switch (event.type) {
@@ -118,7 +124,7 @@ AppRunResult App::handleEvents()
 	return AppRunResult::CONTINUE;
 }
 
-AppRunResult App::iterate()
+AppRunResult App::iterate(const FrameTime &frame_time)
 {
 	static const std::vector<std::array<uint8_t, 3>> colors = {
 		// {255, 0, 0},   // Red
@@ -133,12 +139,17 @@ AppRunResult App::iterate()
 		{0, 150, 0},
 		{0, 200, 0},
 	};
-	static int color_cycle_speed = 20; // Change color every 20 frames
 	static int color_cycle_index = 0;
+	const static Seconds time_color_change_rate = 0.2;
+	static Seconds time_accumulator = 0.0;
 
 	// Rendering
-	color_cycle_index = (color_cycle_index + 1) % (color_cycle_speed * colors.size());
-	const auto &color = colors[color_cycle_index / color_cycle_speed % colors.size()];
+	time_accumulator += frame_time.delta_seconds;
+	while (time_accumulator >= time_color_change_rate) {
+		time_accumulator -= time_color_change_rate;
+		color_cycle_index = (++color_cycle_index) % (colors.size());
+	}
+	const auto &color = colors[color_cycle_index];
 
 	// Clear the screen with a color
 	SDL_SetRenderDrawColor(d->renderer, color[0], color[1], color[2], 255);
@@ -147,7 +158,6 @@ AppRunResult App::iterate()
 	// Present the backbuffer
 	SDL_RenderPresent(d->renderer);
 
-	SDL_Delay(16); // Roughly 60 FPS
 	return AppRunResult::CONTINUE;
 }
 

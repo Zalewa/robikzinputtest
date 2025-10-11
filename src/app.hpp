@@ -1,5 +1,7 @@
 #pragma once
 
+#include "clock.hpp"
+
 #include <memory>
 
 namespace robikzinputtest {
@@ -17,8 +19,8 @@ public:
 
 	AppRunResult init(int argc, char *argv[]);
 	AppRunResult run();
-	AppRunResult iterate();
-	AppRunResult handleEvents();
+	AppRunResult iterate(const FrameTime &frame_time);
+	AppRunResult handleEvents(const FrameTime &frame_time);
 	void close();
 
 private:
