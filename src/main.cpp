@@ -3,6 +3,22 @@
 #include <iostream>
 #include <memory>
 
+const int EC_OK = 0;
+const int EC_FAIL = 1;
+
+static int ec(robikzinputtest::AppRunResult result)
+{
+	using namespace robikzinputtest;
+
+	switch (result) {
+	case AppRunResult::SUCCESS:
+		return EC_OK;
+	case AppRunResult::FAILURE:
+	default:
+		return EC_FAIL;
+	}
+}
+
 int main(int argc, char **argv)
 {
 	using namespace robikzinputtest;
@@ -10,17 +26,20 @@ int main(int argc, char **argv)
 	AppRunResult app_run_result;
 	std::unique_ptr<App> app = std::make_unique<App>();
 	app_run_result = app->init(argc, argv);
-	if (!app_run_result.ok()) {
-		std::cerr << "Error during initialization: " << app_run_result.message << std::endl;
-		return int(app_run_result.code);
+	if (app_run_result != AppRunResult::CONTINUE) {
+		std::cerr << "Stopping after init." << std::endl;
+		app->close();
+		return ec(app_run_result);
 	}
 
 	app_run_result = app->run();
-	if (!app_run_result.ok()) {
-		std::cerr << "Error during run: " << app_run_result.message << std::endl;
-		return int(app_run_result.code);
+	app->close();
+
+	if (app_run_result != AppRunResult::SUCCESS) {
+		std::cerr << "Error during run." << std::endl;
+		return EC_FAIL;
 	}
 
 	app.reset();
-	return 0;
+	return EC_OK;
 }
