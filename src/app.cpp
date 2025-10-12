@@ -17,8 +17,7 @@
 namespace {
 bool is_quit_key(const SDL_KeyboardEvent &key)
 {
-	return key.key == SDLK_ESCAPE
-		|| (key.key == SDLK_Q && (key.mod & SDL_KMOD_CTRL));
+	return (key.key == SDLK_Q && (key.mod & SDL_KMOD_CTRL));
 }
 
 bool is_alt_enter(const SDL_KeyboardEvent &key)
