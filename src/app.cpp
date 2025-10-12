@@ -2,6 +2,9 @@
 #include "clock.hpp"
 #include "version.hpp"
 
+#include <imgui.h>
+#include <imgui_impl_sdl3.h>
+#include <imgui_impl_sdlrenderer3.h>
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_keycode.h>
 
@@ -81,6 +84,16 @@ AppRunResult App::init(int argc, char *argv[])
 		return AppRunResult::FAILURE;
 	}
 
+	// Create ImGUI
+	IMGUI_CHECKVERSION();
+	ImGui::CreateContext();
+	ImGuiIO &io = ImGui::GetIO();
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+
+	ImGui_ImplSDL3_InitForSDLRenderer(d->window, d->renderer);
+	ImGui_ImplSDLRenderer3_Init(d->renderer);
+
 	return AppRunResult::CONTINUE;
 }
 
@@ -106,6 +119,7 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
+		ImGui_ImplSDL3_ProcessEvent(&event);
 		switch (event.type) {
 		case SDL_EVENT_QUIT:
 			return AppRunResult::SUCCESS;
@@ -138,15 +152,26 @@ AppRunResult App::iterate(const FrameTime &frame_time)
 		// {255, 0, 255}  // Magenta
 		// Shades of green:
 		{0, 50, 0},
-		{0, 100, 0},
-		{0, 150, 0},
-		{0, 200, 0},
+		{0, 52, 0},
+		{0, 54, 0},
+		{0, 56, 0},
 	};
 	static int color_cycle_index = 0;
-	const static Seconds time_color_change_rate = 0.2;
+	const static Seconds time_color_change_rate = 0.5;
 	static Seconds time_accumulator = 0.0;
 
-	// Rendering
+	// Render ImGUI
+	ImGui_ImplSDLRenderer3_NewFrame();
+	ImGui_ImplSDL3_NewFrame();
+	ImGui::NewFrame();
+
+	ImGui::Begin("Hello, world!");
+	ImGui::Text("Welcome to Dear ImGui with SDL3!");
+	ImGui::End();
+
+	ImGui::Render();
+
+	// Cycle the background color
 	time_accumulator += frame_time.delta_seconds;
 	while (time_accumulator >= time_color_change_rate) {
 		time_accumulator -= time_color_change_rate;
@@ -157,6 +182,9 @@ AppRunResult App::iterate(const FrameTime &frame_time)
 	// Clear the screen with a color
 	SDL_SetRenderDrawColor(d->renderer, color[0], color[1], color[2], 255);
 	SDL_RenderClear(d->renderer);
+
+	// Draw ImGUI
+	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), d->renderer);
 
 	// Present the backbuffer
 	SDL_RenderPresent(d->renderer);

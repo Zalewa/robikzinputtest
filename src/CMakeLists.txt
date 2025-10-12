@@ -4,12 +4,49 @@ configure_file(version_defs.hpp.in version_defs.hpp)
 # Dependencies
 include(FetchContent)
 
+# SDL3
 FetchContent_Declare(
 	SDL3
 	GIT_REPOSITORY https://github.com/libsdl-org/SDL
 	GIT_TAG release-3.2.24
 )
 FetchContent_MakeAvailable(SDL3)
+
+# Dear ImGui
+FetchContent_Declare(
+	imgui
+	GIT_REPOSITORY https://github.com/ocornut/imgui
+	GIT_TAG v1.92.3
+)
+FetchContent_MakeAvailable(imgui)
+
+add_library(
+	imgui_core
+	STATIC
+	${imgui_SOURCE_DIR}/imgui.cpp
+	${imgui_SOURCE_DIR}/imgui_demo.cpp
+	${imgui_SOURCE_DIR}/imgui_draw.cpp
+	${imgui_SOURCE_DIR}/imgui_tables.cpp
+	${imgui_SOURCE_DIR}/imgui_widgets.cpp
+)
+target_include_directories(
+	imgui_core
+	PUBLIC
+	${imgui_SOURCE_DIR}
+)
+
+add_library(
+	imgui_sdl3_renderer
+	STATIC
+	${imgui_SOURCE_DIR}/backends/imgui_impl_sdl3.cpp
+	${imgui_SOURCE_DIR}/backends/imgui_impl_sdlrenderer3.cpp
+)
+target_include_directories(
+	imgui_sdl3_renderer
+	PUBLIC
+	${imgui_SOURCE_DIR}/backends
+)
+target_link_libraries(imgui_sdl3_renderer PUBLIC imgui_core SDL3::SDL3)
 
 # Main target
 add_executable(
@@ -29,6 +66,7 @@ target_link_libraries(
 	robikzinputtest
 	PRIVATE
 	SDL3::SDL3
+	imgui_sdl3_renderer
 )
 
 set_target_properties(
