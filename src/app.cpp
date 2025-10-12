@@ -25,18 +25,24 @@ bool is_alt_enter(const SDL_KeyboardEvent &key)
 	return key.key == SDLK_RETURN
 		&& (key.mod & SDL_KMOD_ALT);
 }
+
+bool is_gui_demo_key(const SDL_KeyboardEvent &key)
+{
+	return key.key == SDLK_F1;
+}
 } // namespace
 
 namespace robikzinputtest {
 
 struct App::D
 {
-	SDL_Window* window;
-	SDL_Renderer* renderer;
+	SDL_Window* window = nullptr;
+	SDL_Renderer* renderer = nullptr;
 
 	EngineClock clock;
+	bool gui_demo_enabled = false;
 
-	D() : window(nullptr), renderer(nullptr)
+	D()
 	{
 	}
 };
@@ -148,6 +154,8 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 				} else {
 					SDL_SetWindowFullscreen(d->window, SDL_WINDOW_FULLSCREEN);
 				}
+			} else if (is_gui_demo_key(event.key)) {
+				d->gui_demo_enabled = !d->gui_demo_enabled;
 			}
 			break;
 		}
@@ -182,6 +190,9 @@ AppRunResult App::iterate(const FrameTime &frame_time)
 	ImGui::Begin(app_full_signature().c_str());
 	ImGui::Text("Welcome to Dear ImGui with SDL3!");
 	ImGui::End();
+
+	if (d->gui_demo_enabled)
+		ImGui::ShowDemoWindow(&d->gui_demo_enabled);
 
 	ImGui::Render();
 
