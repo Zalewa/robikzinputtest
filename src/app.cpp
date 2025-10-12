@@ -53,6 +53,9 @@ AppRunResult App::init(int argc, char *argv[])
 	(void)argc;
 	(void)argv;
 
+	// Hello App.
+	std::cerr << "Robikz's Input Test v" << app_version() << std::endl;
+
 	// Initialize SDL
 	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK)) {
 		std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
