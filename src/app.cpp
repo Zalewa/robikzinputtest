@@ -183,12 +183,14 @@ AppRunResult App::iterate(const FrameTime &frame_time)
 	static Seconds time_accumulator = 0.0;
 
 	// Render ImGUI
+	ImGuiIO &imgui_io = ImGui::GetIO();
 	ImGui_ImplSDLRenderer3_NewFrame();
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
 
 	ImGui::Begin(app_full_signature().c_str());
 	ImGui::Text("Welcome to Dear ImGui with SDL3!");
+	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / imgui_io.Framerate, imgui_io.Framerate);
 	ImGui::End();
 
 	if (d->gui_demo_enabled)
