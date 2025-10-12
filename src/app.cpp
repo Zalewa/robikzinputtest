@@ -1,4 +1,5 @@
 #include "app.hpp"
+#include "SDL3/SDL_init.h"
 #include "clock.hpp"
 #include "version.hpp"
 
@@ -57,8 +58,22 @@ AppRunResult App::init(int argc, char *argv[])
 	(void)argv;
 
 	// Hello App.
-	std::cerr << "Robikz's Input Test v" << app_version() << std::endl;
+	std::cerr << app_full_signature() << std::endl;
 
+	// Set application metadata
+	SDL_SetAppMetadata(
+		app_name().c_str(),
+		app_version().c_str(),
+		app_identifier().c_str()
+	);
+	SDL_SetAppMetadataProperty(
+		SDL_PROP_APP_METADATA_CREATOR_STRING,
+		app_author().c_str()
+	);
+	SDL_SetAppMetadataProperty(
+		SDL_PROP_APP_METADATA_COPYRIGHT_STRING,
+		app_copyright().c_str()
+	);
 	// Initialize SDL
 	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK)) {
 		std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
@@ -66,7 +81,7 @@ AppRunResult App::init(int argc, char *argv[])
 	}
 
 	// Create a window
-	std::string title = "Robikz's Input Test v" + app_version();
+	const std::string title = app_full_signature();
 	d->window = SDL_CreateWindow(
 		title.c_str(),
 		800, 600,
@@ -165,7 +180,7 @@ AppRunResult App::iterate(const FrameTime &frame_time)
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
 
-	ImGui::Begin("Hello, world!");
+	ImGui::Begin(app_full_signature().c_str());
 	ImGui::Text("Welcome to Dear ImGui with SDL3!");
 	ImGui::End();
 
