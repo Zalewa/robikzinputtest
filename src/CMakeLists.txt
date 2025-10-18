@@ -52,6 +52,11 @@ target_link_libraries(imgui_sdl3_renderer PUBLIC imgui_core SDL3::SDL3)
 add_executable(
 	robikzinputtest
 	app.cpp
+	arena.cpp
+	controller_handler.cpp
+	controller_system.cpp
+	gizmo.cpp
+	gizmo_render.cpp
 	main.cpp
 	version.cpp
 )

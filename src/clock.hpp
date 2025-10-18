@@ -13,6 +13,15 @@ struct FrameTime {
 	TimePoint prevtick;
 	TimePoint currtick;
 	Seconds delta_seconds;
+
+	static FrameTime delta(
+		const TimePoint &prevtick,
+		const TimePoint &currtick
+	) {
+		auto elapsedNs = std::chrono::duration<uint64_t, std::nano>(currtick - prevtick).count();
+		Seconds elapsedSec = elapsedNs / 1e9;
+		return FrameTime { prevtick, currtick, elapsedSec };
+	}
 };
 
 /**
@@ -37,9 +46,7 @@ public:
 		std::this_thread::sleep_until(target);
 		// Get the current time and compute the elapsed time since the last tick.
 		auto now = std::chrono::steady_clock::now();
-		auto elapsedNs = std::chrono::duration<uint64_t, std::nano>(now - m_lasttick).count();
-		Seconds elapsedSec = elapsedNs / 1e9;
-		FrameTime ts { m_lasttick, now, elapsedSec };
+		FrameTime ts = FrameTime::delta(m_lasttick, now);
 		m_lasttick = now;
 		return ts;
 	}

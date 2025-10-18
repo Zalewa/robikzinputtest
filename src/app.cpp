@@ -1,6 +1,9 @@
 #include "app.hpp"
+#include "arena.hpp"
 #include "SDL3/SDL_init.h"
 #include "clock.hpp"
+#include "controller.hpp"
+#include "controller_system.hpp"
 #include "version.hpp"
 
 #include <imgui.h>
@@ -18,6 +21,19 @@ namespace {
 constexpr int DEFAULT_WINDOW_WIDTH = 800;
 constexpr int DEFAULT_WINDOW_HEIGHT = 600;
 
+bool is_keyboard_event(const SDL_Event &event)
+{
+	return event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP;
+}
+
+bool is_mouse_event(const SDL_Event &event)
+{
+	return event.type == SDL_EVENT_MOUSE_BUTTON_DOWN
+		|| event.type == SDL_EVENT_MOUSE_BUTTON_UP
+		|| event.type == SDL_EVENT_MOUSE_MOTION
+		|| event.type == SDL_EVENT_MOUSE_WHEEL;
+}
+
 bool is_quit_key(const SDL_KeyboardEvent &key)
 {
 	return (key.key == SDLK_Q && (key.mod & SDL_KMOD_CTRL));
@@ -33,6 +49,27 @@ bool is_gui_demo_key(const SDL_KeyboardEvent &key)
 {
 	return key.key == SDLK_F1;
 }
+
+bool is_kb_gizmo_create_key(const SDL_KeyboardEvent &key)
+{
+	return key.key == SDLK_RETURN && (key.mod & SDL_KMOD_CTRL);
+}
+
+bool is_imgui_swallowing_event(const SDL_Event &event)
+{
+	ImGuiIO &io = ImGui::GetIO();
+	return (is_keyboard_event(event) && io.WantCaptureKeyboard)
+		|| (is_mouse_event(event) && io.WantCaptureMouse);
+}
+
+bool is_keyboard_priority_event(const SDL_Event &event)
+{
+	return is_keyboard_event(event)
+		&& (
+			is_quit_key(event.key)
+			|| is_alt_enter(event.key)
+		);
+}
 } // namespace
 
 namespace robikzinputtest {
@@ -41,6 +78,9 @@ struct App::D
 {
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
+
+	std::unique_ptr<Arena> arena;
+	std::unique_ptr<ControllerSystem> controller_system;
 
 	EngineClock clock;
 	bool gui_demo_enabled = false;
@@ -82,11 +122,15 @@ AppRunResult App::init(int argc, char *argv[])
 		SDL_PROP_APP_METADATA_COPYRIGHT_STRING,
 		app_copyright().c_str()
 	);
+
 	// Initialize SDL
 	if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK)) {
 		std::cerr << "SDL_Init Error: " << SDL_GetError() << std::endl;
 		return AppRunResult::FAILURE;
 	}
+
+	// Initialize controller system
+	d->controller_system = std::make_unique<ControllerSystem>();
 
 	// Limit clock to 60FPS (TODO: for now)
 	d->clock.set_resolution(std::chrono::microseconds(16666));
@@ -121,6 +165,14 @@ AppRunResult App::init(int argc, char *argv[])
 	ImGui_ImplSDL3_InitForSDLRenderer(d->window, d->renderer);
 	ImGui_ImplSDLRenderer3_Init(d->renderer);
 
+	// Create the arena
+	d->arena = std::make_unique<Arena>();
+	d->arena->load_render(*d->renderer);
+	// Set arena bounds to the actual window size
+	SDL_Point window_size;
+	SDL_GetWindowSize(d->window, &window_size.x, &window_size.y);
+	d->arena->set_bounds({ 0, 0, window_size.x, window_size.y });
+
 	return AppRunResult::CONTINUE;
 }
 
@@ -146,7 +198,14 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
+		// Pass the events to ImGUI first
 		ImGui_ImplSDL3_ProcessEvent(&event);
+		if (is_imgui_swallowing_event(event)
+			&& !is_keyboard_priority_event(event)
+		) {
+			continue;
+		}
+		// Handle app events
 		switch (event.type) {
 		case SDL_EVENT_QUIT:
 			return AppRunResult::SUCCESS;
@@ -161,11 +220,27 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 				} else {
 					SDL_SetWindowFullscreen(d->window, SDL_WINDOW_FULLSCREEN);
 				}
+				continue;
 			} else if (is_gui_demo_key(event.key)) {
 				d->gui_demo_enabled = !d->gui_demo_enabled;
+				continue;
+			} else if (is_kb_gizmo_create_key(event.key)) {
+				// Create a gizmo for the keyboard
+				Controller &controller = d->controller_system->for_keyboard();
+				if (d->arena->find_gizmo_for_controller(controller.id) == nullptr) {
+					std::cerr << "Creating gizmo for keyboard controller." << std::endl;
+					d->arena->create_gizmo(controller.id);
+				}
+				continue;
 			}
 			break;
+		case SDL_EVENT_WINDOW_RESIZED:
+			// Update arena bounds
+			d->arena->set_bounds({ 0, 0, event.window.data1, event.window.data2 });
+			break;
 		}
+		// Now pass the event to controllers
+		d->controller_system->handle_event(event);
 	}
 	return AppRunResult::CONTINUE;
 }
@@ -188,6 +263,9 @@ AppRunResult App::iterate(const FrameTime &frame_time)
 	static int color_cycle_index = 0;
 	const static Seconds time_color_change_rate = 0.5;
 	static Seconds time_accumulator = 0.0;
+
+	// Update arena
+	d->arena->update(*d->controller_system, frame_time);
 
 	// Render ImGUI
 	ImGuiIO &imgui_io = ImGui::GetIO();
@@ -216,6 +294,9 @@ AppRunResult App::iterate(const FrameTime &frame_time)
 	// Clear the screen with a color
 	SDL_SetRenderDrawColor(d->renderer, color[0], color[1], color[2], 255);
 	SDL_RenderClear(d->renderer);
+
+	// Draw the arena
+	d->arena->render(*d->renderer);
 
 	// Draw ImGUI
 	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), d->renderer);
