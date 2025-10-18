@@ -15,6 +15,9 @@
 #include <vector>
 
 namespace {
+constexpr int DEFAULT_WINDOW_WIDTH = 800;
+constexpr int DEFAULT_WINDOW_HEIGHT = 600;
+
 bool is_quit_key(const SDL_KeyboardEvent &key)
 {
 	return (key.key == SDLK_Q && (key.mod & SDL_KMOD_CTRL));
@@ -92,7 +95,8 @@ AppRunResult App::init(int argc, char *argv[])
 	const std::string title = app_full_signature();
 	d->window = SDL_CreateWindow(
 		title.c_str(),
-		800, 600,
+		DEFAULT_WINDOW_WIDTH,
+		DEFAULT_WINDOW_HEIGHT,
 		SDL_WINDOW_RESIZABLE
 	);
 	if (d->window == nullptr) {
