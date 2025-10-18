@@ -85,6 +85,9 @@ AppRunResult App::init(int argc, char *argv[])
 		return AppRunResult::FAILURE;
 	}
 
+	// Limit clock to 60FPS (TODO: for now)
+	d->clock.set_resolution(std::chrono::microseconds(16666));
+
 	// Create a window
 	const std::string title = app_full_signature();
 	d->window = SDL_CreateWindow(
