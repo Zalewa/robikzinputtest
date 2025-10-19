@@ -1,6 +1,5 @@
 #include "app.hpp"
 #include "arena.hpp"
-#include "SDL3/SDL_init.h"
 #include "clock.hpp"
 #include "controller.hpp"
 #include "controller_system.hpp"
@@ -10,7 +9,6 @@
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
 #include <SDL3/SDL.h>
-#include <SDL3/SDL_keycode.h>
 
 #include <array>
 #include <iostream>
@@ -78,6 +76,10 @@ struct App::D
 {
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
+
+	bool imgui_init_context = false;
+	bool imgui_init_platform = false;
+	bool imgui_init_renderer = false;
 
 	std::unique_ptr<Arena> arena;
 	std::unique_ptr<ControllerSystem> controller_system;
@@ -157,13 +159,13 @@ AppRunResult App::init(int argc, char *argv[])
 
 	// Create ImGUI
 	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
+	d->imgui_init_context = ImGui::CreateContext() != nullptr;
 	ImGuiIO &io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-	ImGui_ImplSDL3_InitForSDLRenderer(d->window, d->renderer);
-	ImGui_ImplSDLRenderer3_Init(d->renderer);
+	d->imgui_init_platform = ImGui_ImplSDL3_InitForSDLRenderer(d->window, d->renderer);
+	d->imgui_init_renderer =  ImGui_ImplSDLRenderer3_Init(d->renderer);
 
 	// Create the arena
 	d->arena = std::make_unique<Arena>();
@@ -309,6 +311,22 @@ AppRunResult App::iterate(const FrameTime &frame_time)
 
 void App::close()
 {
+	d->arena.reset();
+	d->controller_system.reset();
+
+	if (d->imgui_init_renderer) {
+		ImGui_ImplSDLRenderer3_Shutdown();
+		d->imgui_init_renderer = false;
+	}
+	if (d->imgui_init_platform) {
+		ImGui_ImplSDL3_Shutdown();
+		d->imgui_init_platform = false;
+	}
+	if (d->imgui_init_context) {
+		ImGui::DestroyContext();
+		d->imgui_init_context = false;
+	}
+
 	if (d->renderer) {
 		SDL_DestroyRenderer(d->renderer);
 		d->renderer = nullptr;
