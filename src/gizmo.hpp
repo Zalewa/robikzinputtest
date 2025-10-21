@@ -17,7 +17,8 @@ class Gizmo {
 public:
 	// Properties
 	float m_speed = 200.0f;
-	Seconds m_action_time = 0.2f;
+	/// Action time should be *very* short in order to appear instantaneous.
+	Seconds m_action_time = 1 / 60.0f;
 
 	// State
 	SDL_FPoint m_position;
