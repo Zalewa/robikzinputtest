@@ -24,6 +24,16 @@ bool is_keyboard_event(const SDL_Event &event)
 	return event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP;
 }
 
+bool is_joystick_event(const SDL_Event &event)
+{
+	return event.type == SDL_EVENT_JOYSTICK_AXIS_MOTION
+		|| event.type == SDL_EVENT_JOYSTICK_BALL_MOTION
+		|| event.type == SDL_EVENT_JOYSTICK_HAT_MOTION
+		|| event.type == SDL_EVENT_JOYSTICK_BUTTON_UP
+		|| event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN
+		;
+}
+
 bool is_mouse_event(const SDL_Event &event)
 {
 	return event.type == SDL_EVENT_MOUSE_BUTTON_DOWN
@@ -48,6 +58,14 @@ bool is_gui_demo_key(const SDL_KeyboardEvent &key)
 	return key.key == SDLK_F1;
 }
 
+bool is_gui_defocus_key(const SDL_Event &event)
+{
+	return (
+		event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN
+		&& event.jbutton.button == 6 // options on xbox gamepad
+	);
+}
+
 bool is_keyboard_gizmo_create_key(const SDL_KeyboardEvent &key)
 {
 	return key.key == SDLK_RETURN || key.key == SDLK_SPACE;
@@ -63,6 +81,7 @@ bool is_imgui_swallowing_event(const SDL_Event &event)
 {
 	ImGuiIO &io = ImGui::GetIO();
 	return (is_keyboard_event(event) && io.WantCaptureKeyboard)
+		|| (is_joystick_event(event) && io.WantCaptureKeyboard)
 		|| (is_mouse_event(event) && io.WantCaptureMouse);
 }
 
@@ -72,6 +91,7 @@ bool is_keyboard_priority_event(const SDL_Event &event)
 		&& (
 			is_quit_key(event.key)
 			|| is_alt_enter(event.key)
+			|| is_gui_demo_key(event.key)
 		);
 }
 } // namespace
@@ -213,6 +233,7 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 
 #define RBKZIT_LOG_JOYSTICK_AXIS 0
 #define RBKZIT_LOG_JOYSTICK_BALL 0
+#define RBKZIT_LOG_JOYSTICK_BUTTON 0
 #define RBKZIT_LOG_JOYSTICK_HAT 0
 
 	SDL_Event event;
@@ -222,6 +243,9 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 		if (is_imgui_swallowing_event(event)
 			&& !is_keyboard_priority_event(event)
 		) {
+			if (is_gui_defocus_key(event)) {
+				ImGui::SetWindowFocus(nullptr);
+			}
 			continue;
 		}
 		// Handle app events
@@ -275,6 +299,13 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 #endif
 			break;
 		case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+#if RBKZIT_LOG_JOYSTICK_BUTTON
+			std::cerr << "SDL_EVENT_JOYSTICK_BUTTON_DOWN "
+				<< "timestamp=" << event.jbutton.timestamp << ", "
+				<< "button=" << static_cast<int32_t>(event.jbutton.button) << ", "
+				<< "down=" << static_cast<int32_t>(event.jbutton.down)
+				<< std::endl;
+#endif
 			if (is_joystick_gizmo_create_key(event.jbutton)) {
 				Controller &controller = d->controller_system->for_joystick(event.jbutton.which);
 				spawn_controller_gizmo(controller);
