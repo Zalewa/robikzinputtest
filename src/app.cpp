@@ -247,7 +247,6 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 				// Create a gizmo for the keyboard
 				Controller &controller = d->controller_system->for_keyboard();
 				spawn_controller_gizmo(controller);
-				continue;
 			}
 			break;
 		case SDL_EVENT_WINDOW_RESIZED:
