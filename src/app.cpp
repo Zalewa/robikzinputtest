@@ -48,9 +48,15 @@ bool is_gui_demo_key(const SDL_KeyboardEvent &key)
 	return key.key == SDLK_F1;
 }
 
-bool is_kb_gizmo_create_key(const SDL_KeyboardEvent &key)
+bool is_keyboard_gizmo_create_key(const SDL_KeyboardEvent &key)
 {
 	return key.key == SDLK_RETURN && (key.mod & SDL_KMOD_CTRL);
+}
+
+bool is_joystick_gizmo_create_key(const SDL_JoyButtonEvent &jbutton)
+{
+	// Any button creates a gizmo
+	return jbutton.down;
 }
 
 bool is_imgui_swallowing_event(const SDL_Event &event)
@@ -198,6 +204,17 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 {
 	(void) frame_time;
 
+	auto spawn_controller_gizmo = [this](Controller &controller) {
+		if (d->arena->find_gizmo_for_controller(controller.id) == nullptr) {
+			std::cerr << "Creating gizmo for " << controller.id.identifier << " controller." << std::endl;
+			d->arena->create_gizmo(controller.id);
+		}
+	};
+
+#define RBKZIT_LOG_JOYSTICK_AXIS 0
+#define RBKZIT_LOG_JOYSTICK_BALL 0
+#define RBKZIT_LOG_JOYSTICK_HAT 0
+
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		// Pass the events to ImGUI first
@@ -226,19 +243,43 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 			} else if (is_gui_demo_key(event.key)) {
 				d->gui_demo_enabled = !d->gui_demo_enabled;
 				continue;
-			} else if (is_kb_gizmo_create_key(event.key)) {
+			} else if (is_keyboard_gizmo_create_key(event.key)) {
 				// Create a gizmo for the keyboard
 				Controller &controller = d->controller_system->for_keyboard();
-				if (d->arena->find_gizmo_for_controller(controller.id) == nullptr) {
-					std::cerr << "Creating gizmo for keyboard controller." << std::endl;
-					d->arena->create_gizmo(controller.id);
-				}
+				spawn_controller_gizmo(controller);
 				continue;
 			}
 			break;
 		case SDL_EVENT_WINDOW_RESIZED:
 			// Update arena bounds
 			d->arena->set_bounds({ 0, 0, event.window.data1, event.window.data2 });
+			break;
+		case SDL_EVENT_JOYSTICK_AXIS_MOTION: {
+#if RBKZIT_LOG_JOYSTICK_AXIS
+			std::cerr << "SDL_EVENT_JOYSTICK_AXIS_MOTION "
+				<< "timestamp=" << event.jaxis.timestamp << ", "
+				<< "which=" << event.jaxis.which << ", "
+				<< "axis=" << static_cast<int32_t>(event.jaxis.axis) << ", "
+				<< "value=" << event.jaxis.value
+				<< std::endl;
+#endif
+			break;
+		}
+		case SDL_EVENT_JOYSTICK_BALL_MOTION:
+#if RBKZIT_LOG_JOYSTICK_BALL
+			std::cerr << "SDL_EVENT_JOYSTICK_BALL_MOTION"<< std::endl;
+#endif
+			break;
+		case SDL_EVENT_JOYSTICK_HAT_MOTION:
+#if RBKZIT_LOG_JOYSTICK_HAT
+			std::cerr << "SDL_EVENT_JOYSTICK_HAT_MOTION" << std::endl;
+#endif
+			break;
+		case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
+			if (is_joystick_gizmo_create_key(event.jbutton)) {
+				Controller &controller = d->controller_system->for_joystick(event.jbutton.which);
+				spawn_controller_gizmo(controller);
+			}
 			break;
 		}
 		// Now pass the event to controllers

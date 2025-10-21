@@ -17,7 +17,7 @@ struct ControllerId {
 
 	Type type = TYPE_NONE;
 	std::string identifier;
-	int index;
+	uint32_t index;
 
 	bool operator==(const ControllerId &other) const {
 		return (type == other.type)
@@ -37,7 +37,7 @@ enum class ButtonState {
 };
 
 struct ControllerState {
-	SDL_Point direction_vec2d = { 0, 0 };
+	SDL_FPoint direction_vec2 = { 0.0f, 0.0f };
 	ButtonState button_primary = ButtonState::CLEAR;
 };
 

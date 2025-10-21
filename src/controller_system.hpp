@@ -15,6 +15,7 @@ public:
 
 	std::shared_ptr<Controller> find_controller_by_id(const ControllerId &id);
 
+	Controller &for_joystick(SDL_JoystickID which);
 	Controller &for_keyboard();
 
 	bool handle_event(const SDL_Event &event);

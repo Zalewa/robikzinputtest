@@ -99,7 +99,7 @@ void Arena::update(ControllerSystem &controller_system, const FrameTime &frame_t
 		if (controller) {
 			// Update gizmo position based on controller state.
 			SDL_FPoint &pos = gizmo->m_position;
-			const SDL_Point &dir = controller->state.direction_vec2d;
+			const SDL_FPoint &dir = controller->state.direction_vec2;
 			pos.x += dir.x * gizmo->m_speed * frame_time.delta_seconds;
 			pos.y += dir.y * gizmo->m_speed * frame_time.delta_seconds;
 			// Clamp to arena bounds.
