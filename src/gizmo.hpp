@@ -25,6 +25,8 @@ public:
 
 	Gizmo();
 
+	bool is_active() const { return m_action_started_at.has_value(); }
+
 	const ControllerId &controller() const { return m_controller; }
 	void set_controller(const ControllerId &controller) { m_controller = controller; }
 
