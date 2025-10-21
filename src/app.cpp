@@ -50,7 +50,7 @@ bool is_gui_demo_key(const SDL_KeyboardEvent &key)
 
 bool is_keyboard_gizmo_create_key(const SDL_KeyboardEvent &key)
 {
-	return key.key == SDLK_RETURN && (key.mod & SDL_KMOD_CTRL);
+	return key.key == SDLK_RETURN || key.key == SDLK_SPACE;
 }
 
 bool is_joystick_gizmo_create_key(const SDL_JoyButtonEvent &jbutton)

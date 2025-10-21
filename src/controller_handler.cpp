@@ -108,6 +108,7 @@ bool KeyboardControllerHandler::handle_event(
 			state.direction_vec2.x = is_pressed ? 1.0 : 0.0;
 			return true;
 		case SDLK_SPACE:
+		case SDLK_RETURN:
 			state.button_primary = is_pressed ? ButtonState::PRESSED : ButtonState::RELEASED;
 			return true;
 		default:
