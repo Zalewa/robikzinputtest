@@ -76,6 +76,8 @@ struct Gui::D {
 
 	bool gui_demo_enabled = false;
 
+	bool show_fps = true;
+
 	D(
 		SDL_Window &window,
 		SDL_Renderer &renderer
@@ -182,21 +184,25 @@ void Gui::iterate(
 	ImGui::NewFrame();
 
 	// FPS Overlay
-	ImGui::SetNextWindowPos(
-		{ static_cast<float>(window_size.x), 0 },
-		0,
-		{ 1.0, 0 }
-	);
-	ImGui::Begin("FPS Overlay", nullptr, inert_window_flags);
-	ImGui::Text(
-		"%.3f ms/frame (%.1f FPS)",
-		1000.0f / imgui_io.Framerate,
-		imgui_io.Framerate
-	);
-	ImGui::End(); // FPS Overlay
+	if (d->show_fps) {
+		// TODO there is a focus loss issue when the fps indicator is shown
+		ImGui::SetNextWindowPos(
+			{ static_cast<float>(window_size.x), 0 },
+			0,
+			{ 1.0, 0 }
+		);
+		ImGui::Begin("FPS Overlay", nullptr, inert_window_flags);
+		ImGui::Text(
+			"%.3f ms/frame (%.1f FPS)",
+			1000.0f / imgui_io.Framerate,
+			imgui_io.Framerate
+		);
+		ImGui::End(); // FPS Overlay
+	}
 
 	// Main Window
 	ImGui::Begin(MAIN_WINDOW_TITLE.c_str());
+	ImGui::Checkbox("Show FPS", &d->show_fps);
 	ImGui::End(); // Main Window
 
 	if (d->gui_demo_enabled)
