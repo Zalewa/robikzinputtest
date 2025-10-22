@@ -37,6 +37,14 @@ static bool is_imgui_swallowing_event(const SDL_Event &event) {
 		|| (sdl::is_mouse_event(event) && io.WantCaptureMouse);
 }
 
+static constexpr ImGuiWindowFlags inert_window_flags = 0
+	| ImGuiWindowFlags_NoDecoration
+	| ImGuiWindowFlags_NoBackground
+	| ImGuiWindowFlags_NoInputs
+	| ImGuiWindowFlags_NoMove
+	| ImGuiWindowFlags_NoSavedSettings
+	;
+
 struct Gui::D {
 	SDL_Window &window;
 	SDL_Renderer &renderer;
@@ -132,15 +140,31 @@ bool Gui::handle_event(SDL_Event &event) {
 void Gui::iterate(
 	const FrameTime &frame_time
 ) {
+	SDL_Point window_size = {0, 0};
+	SDL_GetWindowSize(&d->window, &window_size.x, &window_size.y);
+
 	ImGuiIO &imgui_io = ImGui::GetIO();
 	ImGui_ImplSDLRenderer3_NewFrame();
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
 
+	// FPS Overlay
+	ImGui::SetNextWindowPos(
+		{ static_cast<float>(window_size.x), 0 },
+		0,
+		{ 1.0, 0 }
+	);
+	ImGui::Begin("FPS Overlay", nullptr, inert_window_flags);
+	ImGui::Text(
+		"%.3f ms/frame (%.1f FPS)",
+		1000.0f / imgui_io.Framerate,
+		imgui_io.Framerate
+	);
+	ImGui::End(); // FPS Overlay
+
+	// Main Window
 	ImGui::Begin(app_full_signature().c_str());
-	ImGui::Text("Welcome to Dear ImGui with SDL3!");
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / imgui_io.Framerate, imgui_io.Framerate);
-	ImGui::End();
+	ImGui::End(); // Main Window
 
 	if (d->gui_demo_enabled)
 		ImGui::ShowDemoWindow(&d->gui_demo_enabled);
