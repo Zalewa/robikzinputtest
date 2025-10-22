@@ -3,6 +3,8 @@
 #include "clock.hpp"
 #include "controller.hpp"
 #include "controller_system.hpp"
+#include "gui.hpp"
+#include "sdl_event.hpp"
 #include "version.hpp"
 
 #include <imgui.h>
@@ -15,32 +17,11 @@
 #include <string>
 #include <vector>
 
+namespace robikzinputtest {
+
 namespace {
 constexpr int DEFAULT_WINDOW_WIDTH = 800;
 constexpr int DEFAULT_WINDOW_HEIGHT = 600;
-
-bool is_keyboard_event(const SDL_Event &event)
-{
-	return event.type == SDL_EVENT_KEY_DOWN || event.type == SDL_EVENT_KEY_UP;
-}
-
-bool is_joystick_event(const SDL_Event &event)
-{
-	return event.type == SDL_EVENT_JOYSTICK_AXIS_MOTION
-		|| event.type == SDL_EVENT_JOYSTICK_BALL_MOTION
-		|| event.type == SDL_EVENT_JOYSTICK_HAT_MOTION
-		|| event.type == SDL_EVENT_JOYSTICK_BUTTON_UP
-		|| event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN
-		;
-}
-
-bool is_mouse_event(const SDL_Event &event)
-{
-	return event.type == SDL_EVENT_MOUSE_BUTTON_DOWN
-		|| event.type == SDL_EVENT_MOUSE_BUTTON_UP
-		|| event.type == SDL_EVENT_MOUSE_MOTION
-		|| event.type == SDL_EVENT_MOUSE_WHEEL;
-}
 
 bool is_quit_key(const SDL_KeyboardEvent &key)
 {
@@ -51,19 +32,6 @@ bool is_alt_enter(const SDL_KeyboardEvent &key)
 {
 	return key.key == SDLK_RETURN
 		&& (key.mod & SDL_KMOD_ALT);
-}
-
-bool is_gui_demo_key(const SDL_KeyboardEvent &key)
-{
-	return key.key == SDLK_F1;
-}
-
-bool is_gui_defocus_key(const SDL_Event &event)
-{
-	return (
-		event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN
-		&& event.jbutton.button == 6 // options on xbox gamepad
-	);
 }
 
 bool is_keyboard_gizmo_create_key(const SDL_KeyboardEvent &key)
@@ -77,41 +45,31 @@ bool is_joystick_gizmo_create_key(const SDL_JoyButtonEvent &jbutton)
 	return jbutton.down;
 }
 
-bool is_imgui_swallowing_event(const SDL_Event &event)
-{
-	ImGuiIO &io = ImGui::GetIO();
-	return (is_keyboard_event(event) && io.WantCaptureKeyboard)
-		|| (is_joystick_event(event) && io.WantCaptureKeyboard)
-		|| (is_mouse_event(event) && io.WantCaptureMouse);
-}
-
 bool is_keyboard_priority_event(const SDL_Event &event)
 {
+	using namespace robikzinputtest::sdl;
 	return is_keyboard_event(event)
 		&& (
 			is_quit_key(event.key)
 			|| is_alt_enter(event.key)
-			|| is_gui_demo_key(event.key)
 		);
 }
-} // namespace
 
-namespace robikzinputtest {
+bool is_app_input_priority_event(const SDL_Event &event) {
+	return is_keyboard_priority_event(event);
+}
+} // namespace
 
 struct App::D
 {
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
 
-	bool imgui_init_context = false;
-	bool imgui_init_platform = false;
-	bool imgui_init_renderer = false;
-
 	std::unique_ptr<Arena> arena;
 	std::unique_ptr<ControllerSystem> controller_system;
+	std::unique_ptr<Gui> gui;
 
 	EngineClock clock;
-	bool gui_demo_enabled = false;
 
 	D()
 	{
@@ -183,15 +141,11 @@ AppRunResult App::init(int argc, char *argv[])
 		return AppRunResult::FAILURE;
 	}
 
-	// Create ImGUI
-	IMGUI_CHECKVERSION();
-	d->imgui_init_context = ImGui::CreateContext() != nullptr;
-	ImGuiIO &io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-
-	d->imgui_init_platform = ImGui_ImplSDL3_InitForSDLRenderer(d->window, d->renderer);
-	d->imgui_init_renderer =  ImGui_ImplSDLRenderer3_Init(d->renderer);
+	// Create GUI
+	d->gui = std::make_unique<Gui>(*d->window, *d->renderer);
+	if (!d->gui->init()) {
+		return AppRunResult::FAILURE;
+	}
 
 	// Create the arena
 	d->arena = std::make_unique<Arena>();
@@ -239,13 +193,8 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		// Pass the events to ImGUI first
-		ImGui_ImplSDL3_ProcessEvent(&event);
-		if (is_imgui_swallowing_event(event)
-			&& !is_keyboard_priority_event(event)
-		) {
-			if (is_gui_defocus_key(event)) {
-				ImGui::SetWindowFocus(nullptr);
-			}
+		const bool handled_by_gui = d->gui->handle_event(event);
+		if (handled_by_gui && !is_app_input_priority_event(event)) {
 			continue;
 		}
 		// Handle app events
@@ -263,9 +212,6 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 				} else {
 					SDL_SetWindowFullscreen(d->window, SDL_WINDOW_FULLSCREEN);
 				}
-				continue;
-			} else if (is_gui_demo_key(event.key)) {
-				d->gui_demo_enabled = !d->gui_demo_enabled;
 				continue;
 			} else if (is_keyboard_gizmo_create_key(event.key)) {
 				// Create a gizmo for the keyboard
@@ -340,22 +286,6 @@ AppRunResult App::iterate(const FrameTime &frame_time)
 	// Update arena
 	d->arena->update(*d->controller_system, frame_time);
 
-	// Render ImGUI
-	ImGuiIO &imgui_io = ImGui::GetIO();
-	ImGui_ImplSDLRenderer3_NewFrame();
-	ImGui_ImplSDL3_NewFrame();
-	ImGui::NewFrame();
-
-	ImGui::Begin(app_full_signature().c_str());
-	ImGui::Text("Welcome to Dear ImGui with SDL3!");
-	ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / imgui_io.Framerate, imgui_io.Framerate);
-	ImGui::End();
-
-	if (d->gui_demo_enabled)
-		ImGui::ShowDemoWindow(&d->gui_demo_enabled);
-
-	ImGui::Render();
-
 	// Cycle the background color
 	time_accumulator += frame_time.delta_seconds;
 	while (time_accumulator >= time_color_change_rate) {
@@ -371,8 +301,8 @@ AppRunResult App::iterate(const FrameTime &frame_time)
 	// Draw the arena
 	d->arena->render(*d->renderer);
 
-	// Draw ImGUI
-	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), d->renderer);
+	// Draw GUI
+	d->gui->iterate(frame_time);
 
 	// Present the backbuffer
 	SDL_RenderPresent(d->renderer);
@@ -384,19 +314,7 @@ void App::close()
 {
 	d->arena.reset();
 	d->controller_system.reset();
-
-	if (d->imgui_init_renderer) {
-		ImGui_ImplSDLRenderer3_Shutdown();
-		d->imgui_init_renderer = false;
-	}
-	if (d->imgui_init_platform) {
-		ImGui_ImplSDL3_Shutdown();
-		d->imgui_init_platform = false;
-	}
-	if (d->imgui_init_context) {
-		ImGui::DestroyContext();
-		d->imgui_init_context = false;
-	}
+	d->gui.reset();
 
 	if (d->renderer) {
 		SDL_DestroyRenderer(d->renderer);

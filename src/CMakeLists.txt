@@ -57,6 +57,7 @@ add_executable(
 	controller_system.cpp
 	gizmo.cpp
 	gizmo_render.cpp
+	gui.cpp
 	main.cpp
 	version.cpp
 )
