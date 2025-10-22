@@ -16,6 +16,8 @@ public:
 	void close();
 
 	void clear_focus();
+	void grab_focus();
+
 	bool is_demo_enabled() const;
 	void set_demo_enabled(bool enabled);
 

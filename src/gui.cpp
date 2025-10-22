@@ -8,6 +8,8 @@
 
 namespace robikzinputtest {
 
+static const std::string MAIN_WINDOW_TITLE = app_full_signature();
+
 static bool is_gui_demo_key(const SDL_KeyboardEvent &event) {
 	return (
 		event.type == SDL_EVENT_KEY_DOWN
@@ -26,8 +28,27 @@ static bool is_gui_defocus_button(const SDL_JoyButtonEvent &event) {
 	);
 }
 
+static bool is_gui_defocus_key(const SDL_KeyboardEvent &event) {
+	return (
+		event.type == SDL_EVENT_KEY_DOWN
+		&& event.key == SDLK_ESCAPE
+	);
+}
+
 static bool is_gui_defocus_event(const SDL_Event &event) {
-	return is_gui_defocus_button(event.jbutton);
+	return is_gui_defocus_button(event.jbutton)
+		|| is_gui_defocus_key(event.key);
+}
+
+static bool is_gui_focus_key(const SDL_KeyboardEvent &event) {
+	return (
+		event.type == SDL_EVENT_KEY_DOWN
+		&& event.key == SDLK_ESCAPE
+	);
+}
+
+static bool is_gui_focus_event(const SDL_Event &event) {
+	return is_gui_focus_key(event.key);
 }
 
 static bool is_imgui_swallowing_event(const SDL_Event &event) {
@@ -111,6 +132,10 @@ void Gui::clear_focus() {
 	ImGui::SetWindowFocus(nullptr);
 }
 
+void Gui::grab_focus() {
+	ImGui::SetWindowFocus(MAIN_WINDOW_TITLE.c_str());
+}
+
 bool Gui::is_demo_enabled() const {
 	return d->gui_demo_enabled;
 }
@@ -120,6 +145,14 @@ void Gui::set_demo_enabled(bool enabled) {
 }
 
 bool Gui::handle_event(SDL_Event &event) {
+	if (
+		is_gui_focus_event(event)
+		&& !is_imgui_swallowing_event(event)
+	) {
+		grab_focus();
+		return true;
+	}
+
 	if (
 		is_gui_defocus_event(event)
 		&& is_imgui_swallowing_event(event)
@@ -163,7 +196,7 @@ void Gui::iterate(
 	ImGui::End(); // FPS Overlay
 
 	// Main Window
-	ImGui::Begin(app_full_signature().c_str());
+	ImGui::Begin(MAIN_WINDOW_TITLE.c_str());
 	ImGui::End(); // Main Window
 
 	if (d->gui_demo_enabled)
