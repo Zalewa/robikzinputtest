@@ -5,11 +5,12 @@
 
 namespace robikzinputtest {
 
+class App;
 struct FrameTime;
 
 class Gui {
 public:
-	Gui(SDL_Window &window, SDL_Renderer &renderer);
+	Gui(App &app, SDL_Window &window, SDL_Renderer &renderer);
 	~Gui();
 
 	bool init();

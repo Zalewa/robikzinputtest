@@ -16,7 +16,18 @@ const std::string app_copyright();
  */
 const std::string app_full_signature();
 /**
- * Identifier of the application, usually in reverse domain name notation.
+ * The organization part of the app identifier.
+ */
+const std::string app_identifier_organization();
+/**
+ * The application name part of the app identifier.
+ */
+const std::string app_identifier_appname();
+/**
+ * Identifier of the application, in reverse domain name notation.
+ *
+ * Is a concatenation of app_identifier_organization()
+ * and app_identifier_appname().
  */
 const std::string app_identifier();
 /**

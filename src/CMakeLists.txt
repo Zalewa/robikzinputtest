@@ -59,6 +59,11 @@ add_executable(
 	gizmo_render.cpp
 	gui.cpp
 	main.cpp
+	properties_file.cpp
+	sdl_settings.cpp
+	sdl_storage.cpp
+	settings.cpp
+	variant.cpp
 	version.cpp
 )
 

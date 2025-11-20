@@ -1,5 +1,7 @@
 #include "gui.hpp"
+#include "app.hpp"
 #include "sdl_event.hpp"
+#include "settings.hpp"
 #include "version.hpp"
 
 #include <imgui.h>
@@ -67,6 +69,7 @@ static constexpr ImGuiWindowFlags inert_window_flags = 0
 	;
 
 struct Gui::D {
+	App &app;
 	SDL_Window &window;
 	SDL_Renderer &renderer;
 
@@ -76,19 +79,20 @@ struct Gui::D {
 
 	bool gui_demo_enabled = false;
 
-	bool show_fps = true;
-
 	D(
+		App &app,
 		SDL_Window &window,
 		SDL_Renderer &renderer
-	) : window(window),
+	) : app(app),
+		window(window),
 		renderer(renderer) {}
 };
 
 Gui::Gui(
+	App &app,
 	SDL_Window &window,
 	SDL_Renderer &renderer
-) : d(std::make_unique<D>(window, renderer)) {
+) : d(std::make_unique<D>(app, window, renderer)) {
 }
 
 Gui::~Gui() {
@@ -184,7 +188,7 @@ void Gui::iterate(
 	ImGui::NewFrame();
 
 	// FPS Overlay
-	if (d->show_fps) {
+	if (d->app.settings().show_fps) {
 		// TODO there is a focus loss issue when the fps indicator is shown
 		ImGui::SetNextWindowPos(
 			{ static_cast<float>(window_size.x), 0 },
@@ -202,7 +206,7 @@ void Gui::iterate(
 
 	// Main Window
 	ImGui::Begin(MAIN_WINDOW_TITLE.c_str());
-	ImGui::Checkbox("Show FPS", &d->show_fps);
+	ImGui::Checkbox("Show FPS", &d->app.settings().show_fps);
 	ImGui::End(); // Main Window
 
 	if (d->gui_demo_enabled)

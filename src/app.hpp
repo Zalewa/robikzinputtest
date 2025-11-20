@@ -6,6 +6,8 @@
 
 namespace robikzinputtest {
 
+struct Settings;
+
 enum class AppRunResult {
 	SUCCESS,
 	FAILURE,
@@ -22,6 +24,8 @@ public:
 	AppRunResult iterate(const FrameTime &frame_time);
 	AppRunResult handleEvents(const FrameTime &frame_time);
 	void close();
+
+	Settings &settings();
 
 private:
 	struct D;

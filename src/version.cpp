@@ -18,9 +18,19 @@ const std::string app_full_signature()
 	return app_name() + " v" + app_version();
 }
 
+const std::string app_identifier_organization()
+{
+	return "com.github.zalewa";
+}
+
+const std::string app_identifier_appname()
+{
+	return "robikzinputtest";
+}
+
 const std::string app_identifier()
 {
-	return "com.github.zalewa.robikzinputtest";
+	return app_identifier_organization() + "." + app_identifier_appname();
 }
 
 const std::string app_name()

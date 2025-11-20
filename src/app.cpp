@@ -5,6 +5,8 @@
 #include "controller_system.hpp"
 #include "gui.hpp"
 #include "sdl_event.hpp"
+#include "sdl_settings.hpp"
+#include "settings.hpp"
 #include "version.hpp"
 
 #include <imgui.h>
@@ -65,6 +67,8 @@ struct App::D
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
 
+	Settings settings;
+
 	std::unique_ptr<Arena> arena;
 	std::unique_ptr<ControllerSystem> controller_system;
 	std::unique_ptr<Gui> gui;
@@ -115,6 +119,11 @@ AppRunResult App::init(int argc, char *argv[])
 		return AppRunResult::FAILURE;
 	}
 
+	// Load settings
+	sdl::SettingsSdlIO settings_io;
+	auto settings_load_result = settings_io.load();
+	d->settings = settings_load_result.second;
+
 	// Initialize controller system
 	d->controller_system = std::make_unique<ControllerSystem>();
 
@@ -142,7 +151,7 @@ AppRunResult App::init(int argc, char *argv[])
 	}
 
 	// Create GUI
-	d->gui = std::make_unique<Gui>(*d->window, *d->renderer);
+	d->gui = std::make_unique<Gui>(*this, *d->window, *d->renderer);
 	if (!d->gui->init()) {
 		return AppRunResult::FAILURE;
 	}
@@ -324,7 +333,18 @@ void App::close()
 		SDL_DestroyWindow(d->window);
 		d->window = nullptr;
 	}
+
+	// Save settings.
+	sdl::SettingsSdlIO settings_io;
+	if (!settings_io.save(d->settings)) {
+		std::cerr << "Failed to save settings" << std::endl;
+	}
+
 	SDL_Quit();
+}
+
+Settings &App::settings() {
+	return d->settings;
 }
 
 } // namespace robikzinputtest
