@@ -17,8 +17,8 @@ struct Settings {
 
 	float target_fps = 60.0f;
 
-	int gizmo_width = 20;
-	int gizmo_height = 20;
+	int gizmo_width = 50;
+	int gizmo_height = 50;
 
 	/**
 	 * Value below which the axis motion is not triggered.
