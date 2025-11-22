@@ -40,6 +40,9 @@ bool JoystickControllerHandler::handle_event(
 ) {
 	ControllerState &state = controller.state;
 	if (event.type == SDL_EVENT_JOYSTICK_AXIS_MOTION) {
+		if (event.jaxis.which != controller.id.index)
+			return false;
+
 		const uint32_t axis = event.jaxis.axis;
 		if (is_joystick_throttle_axis(axis)) {
 			if (event.jaxis.value >= SDL_JOYSTICK_AXIS_MIN + JOYSTICK_AXIS_THRESHOLD) {
@@ -73,6 +76,9 @@ bool JoystickControllerHandler::handle_event(
 		event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN
 		|| event.type == SDL_EVENT_JOYSTICK_BUTTON_UP
 	) {
+		if (event.jbutton.which != controller.id.index)
+			return false;
+
 		const bool is_pressed = event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN;
 		state.button_primary = is_pressed ? ButtonState::PRESSED : ButtonState::RELEASED;
 	}
