@@ -106,7 +106,11 @@ void Arena::render(Renderer &renderer) {
 	}
 
 	// Draw arena bounds
-	SDL_SetRenderDrawColor(&renderer, 0, 255, 0, 255);
+	const Color bgcolor = m_app.settings().background_color;
+	const ColorU8 border_color = ColorU8<uint8_t>::from(
+		bgcolor.adjust_brightness(bgcolor.is_light() ? -0.3f : 0.3f)
+	);
+	SDL_SetRenderDrawColor(&renderer, border_color.r, border_color.g, border_color.b, 255);
 	SDL_RenderRect(&renderer, &m_bounds);
 
 	// Render all gizmos

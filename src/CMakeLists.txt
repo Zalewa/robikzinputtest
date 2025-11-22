@@ -53,6 +53,7 @@ add_executable(
 	robikzinputtest
 	app.cpp
 	arena.cpp
+	color.cpp
 	controller_handler.cpp
 	controller_system.cpp
 	gizmo.cpp

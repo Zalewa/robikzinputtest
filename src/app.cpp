@@ -276,36 +276,35 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 
 AppRunResult App::iterate(const FrameTime &frame_time)
 {
-	static const std::vector<std::array<uint8_t, 3>> colors = {
-		// {255, 0, 0},   // Red
-		// {0, 255, 0},   // Green
-		// {0, 0, 255},   // Blue
-		// {255, 255, 0}, // Yellow
-		// {0, 255, 255}, // Cyan
-		// {255, 0, 255}  // Magenta
-		// Shades of green:
-		{0, 50, 0},
-		{0, 52, 0},
-		{0, 54, 0},
-		{0, 56, 0},
+	// Background color setup.
+	const Color base_bgcolor = d->settings.background_color;
+	const bool is_bgcolor_light = base_bgcolor.is_light();
+	const std::array<Color, 4> colors = {
+		base_bgcolor,
+		base_bgcolor.adjust_brightness(is_bgcolor_light ? -0.02f : 0.01f),
+		base_bgcolor.adjust_brightness(is_bgcolor_light ? -0.04f : 0.0125f),
+		base_bgcolor.adjust_brightness(is_bgcolor_light ? -0.06f : 0.0175f),
 	};
 	static int color_cycle_index = 0;
 	const static Seconds time_color_change_rate = 0.5;
 	static Seconds time_accumulator = 0.0;
+	// Cycle the background color
+	if (d->settings.background_animate) {
+		time_accumulator += frame_time.delta_seconds;
+		while (time_accumulator >= time_color_change_rate) {
+			time_accumulator -= time_color_change_rate;
+			color_cycle_index = (++color_cycle_index) % (colors.size());
+		}
+	} else {
+		color_cycle_index = 0;
+	}
+	auto bgcolor = ColorU8<uint8_t>::from(colors[color_cycle_index]);
 
 	// Update arena
 	d->arena->update(*d->controller_system, frame_time);
 
-	// Cycle the background color
-	time_accumulator += frame_time.delta_seconds;
-	while (time_accumulator >= time_color_change_rate) {
-		time_accumulator -= time_color_change_rate;
-		color_cycle_index = (++color_cycle_index) % (colors.size());
-	}
-	const auto &color = colors[color_cycle_index];
-
 	// Clear the screen with a color
-	SDL_SetRenderDrawColor(d->renderer, color[0], color[1], color[2], 255);
+	SDL_SetRenderDrawColor(d->renderer, bgcolor[0], bgcolor[1], bgcolor[2], 255);
 	SDL_RenderClear(d->renderer);
 
 	// Draw the arena

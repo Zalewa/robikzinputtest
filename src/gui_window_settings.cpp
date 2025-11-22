@@ -35,11 +35,13 @@ void window_settings(const GuiContext &guictx) {
 		guictx.app.recalculate_fps_clock();
 	}
 	ImGui::Separator();
+
 	// UI settings
 	ImGui::Checkbox("Show help", &guictx.app.settings().show_help);
 	ImGui::Checkbox("Show help at start", &guictx.app.settings().show_help_at_start);
 	ImGui::Checkbox("Show settings at start", &guictx.app.settings().show_settings_at_start);
 	ImGui::Separator();
+
 	// Gizmos
 	const std::string remove_all_gizmos_label =
 		"Remove all Gizmos ("s + std::to_string(guictx.app.arena().gizmos().size()) + ")"s;
@@ -63,6 +65,11 @@ void window_settings(const GuiContext &guictx) {
 	) {
 		guictx.app.arena().set_gizmos_height(guictx.app.settings().gizmo_height);
 	}
+
+	ImGui::Separator();
+	// Background
+	ImGui::ColorEdit3("Background", &guictx.app.settings().background_color.value[0]);
+	ImGui::Checkbox("Cycle Background", &guictx.app.settings().background_animate);
 
 	ImGui::End();
 }

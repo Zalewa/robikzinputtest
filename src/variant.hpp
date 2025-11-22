@@ -1,5 +1,7 @@
 #pragma once
 
+#include "color.hpp"
+
 #include <string>
 
 namespace robikzinputtest {
@@ -9,11 +11,13 @@ public:
 	Variant() : m_valid(false) {}
 	Variant(std::string s) : m_value(s) {}
 	Variant(bool b) : m_value(b ? "true" : "false") {}
+	Variant(Color color) : m_value(color.to_rgba_hex()) {}
 	Variant(int32_t i) : m_value(std::to_string(i)) {}
 	Variant(int64_t i) : m_value(std::to_string(i)) {}
 	Variant(double d) : m_value(std::to_string(d)) {}
 
 	operator std::string() const { return as_string(); }
+	operator Color() const { return as_color(); }
 	operator bool() const { return as_bool(); }
 	operator int32_t() const { return as_int32(); }
 	operator int64_t() const { return as_int64(); }
@@ -22,6 +26,7 @@ public:
 
 	const std::string &as_string() const { return m_value; }
 	bool as_bool() const;
+	Color as_color() const { return Color::from_hex(m_value); }
 	int32_t as_int32() const;
 	int64_t as_int64() const;
 	float as_float() const;
