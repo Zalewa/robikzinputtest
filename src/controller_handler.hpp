@@ -4,11 +4,13 @@
 
 namespace robikzinputtest {
 
+class App;
 class Controller;
 
 class ControllerHandler {
 public:
 	virtual bool handle_event(
+		App &app,
 		Controller &controller,
 		const SDL_Event &event
 	) = 0;
@@ -17,6 +19,7 @@ public:
 class JoystickControllerHandler : public ControllerHandler {
 public:
 	bool handle_event(
+		App &app,
 		Controller &controller,
 		const SDL_Event &event
 	) override;
@@ -25,6 +28,7 @@ public:
 class KeyboardControllerHandler : public ControllerHandler {
 public:
 	bool handle_event(
+		App &app,
 		Controller &controller,
 		const SDL_Event &event
 	) override;

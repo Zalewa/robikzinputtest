@@ -7,12 +7,16 @@
 namespace robikzinputtest {
 
 struct ControllerSystem::D {
+	App &app;
+
 	std::shared_ptr<Controller> m_keyboard_controller;
 	std::map<SDL_JoystickID, std::shared_ptr<Controller>> m_joystick_controllers;
+
+	D(App &app) : app(app) {}
 };
 
-ControllerSystem::ControllerSystem()
-	: d(std::make_unique<D>()) {
+ControllerSystem::ControllerSystem(App &app)
+	: d(std::make_unique<D>(app)) {
 	// Initialize keyboard
 	const ControllerId controller_id = {
 		.type = ControllerId::TYPE_KEYBOARD,
@@ -64,10 +68,10 @@ Controller &ControllerSystem::for_keyboard() {
 bool ControllerSystem::handle_event(const SDL_Event &event) {
 	// Pass the event to all controllers
 	bool handled = false;
-	if (d->m_keyboard_controller->handle_event(event))
+	if (d->m_keyboard_controller->handle_event(d->app, event))
 		return true;
 	for (auto it : d->m_joystick_controllers) {
-		if (it.second->handle_event(event))
+		if (it.second->handle_event(d->app, event))
 			return true;
 	}
 	return false;

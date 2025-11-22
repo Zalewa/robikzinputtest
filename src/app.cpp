@@ -136,7 +136,7 @@ AppRunResult App::init(int argc, char *argv[])
 	d->settings = settings_load_result.second;
 
 	// Initialize controller system
-	d->controller_system = std::make_unique<ControllerSystem>();
+	d->controller_system = std::make_unique<ControllerSystem>(*this);
 
 	// Limit clock to target FPS
 	recalculate_fps_clock();

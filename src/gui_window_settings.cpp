@@ -69,6 +69,11 @@ void window_settings(const GuiContext &guictx) {
 	) {
 		guictx.app.arena().set_gizmos_height(guictx.app.settings().gizmo_height);
 	}
+	ImGui::SetNextItemWidth(120.0f);
+	ImGui::DragInt(
+		"Joystick deadzone", &guictx.app.settings().joystick_deadzone,
+		50.0f, 0, SDL_JOYSTICK_AXIS_MAX, "%d", ImGuiSliderFlags_AlwaysClamp
+	);
 
 	ImGui::Separator();
 	// Background

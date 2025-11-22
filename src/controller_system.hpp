@@ -5,12 +5,13 @@
 
 namespace robikzinputtest {
 
+class App;
 class Controller;
 struct ControllerId;
 
 class ControllerSystem {
 public:
-	ControllerSystem();
+	ControllerSystem(App &app);
 	~ControllerSystem();
 
 	std::shared_ptr<Controller> find_controller_by_id(const ControllerId &id);

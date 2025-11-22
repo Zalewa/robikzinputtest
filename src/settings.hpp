@@ -20,6 +20,14 @@ struct Settings {
 	int gizmo_width = 20;
 	int gizmo_height = 20;
 
+	/**
+	 * Value below which the axis motion is not triggered.
+	 *
+	 * The default value has been picked basing on tests with
+	 * XBox Series Elite 2 plus some safety padding.
+	 */
+	int joystick_deadzone = static_cast<int>(32767.0f * 0.2f);
+
 	Color background_color = { 0.0f, 0.20f, 0.0f, 1.0f };
 	bool background_animate = true;
 	Color background_flash_color = { 1.0f, 1.0f, 1.0f, 1.0f };

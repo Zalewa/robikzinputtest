@@ -1,6 +1,8 @@
 #include "controller_handler.hpp"
 
+#include "app.hpp"
 #include "controller.hpp"
+#include "settings.hpp"
 #include <SDL3/SDL.h>
 #include <cstdlib>
 
@@ -35,6 +37,7 @@ static bool is_joystick_throttle_axis(int32_t axis) {
 }
 
 bool JoystickControllerHandler::handle_event(
+	App &app,
 	Controller &controller,
 	const SDL_Event &event
 ) {
@@ -51,12 +54,13 @@ bool JoystickControllerHandler::handle_event(
 				state.button_primary = ButtonState::RELEASED;
 			}
 		}
-		if (std::abs(event.jaxis.value) >= JOYSTICK_AXIS_THRESHOLD) {
+		const double stick_deadzone = app.settings().joystick_deadzone;
+		if (std::abs(event.jaxis.value) >= stick_deadzone) {
 			double normalized = 0.0;
 			if (event.jaxis.value > 0) {
-				normalized = static_cast<double>(event.jaxis.value) / SDL_JOYSTICK_AXIS_MAX;
+				normalized = static_cast<double>(event.jaxis.value - stick_deadzone) / (SDL_JOYSTICK_AXIS_MAX - stick_deadzone);
 			} else if (event.jaxis.value < 0) {
-				normalized = static_cast<double>(event.jaxis.value) / SDL_JOYSTICK_AXIS_MIN;
+				normalized = static_cast<double>(event.jaxis.value + stick_deadzone) / (SDL_JOYSTICK_AXIS_MIN + stick_deadzone);
 				normalized *= -1.0;
 			}
 
@@ -90,6 +94,7 @@ bool JoystickControllerHandler::handle_event(
 */
 
 bool KeyboardControllerHandler::handle_event(
+	App &app,
 	Controller &controller,
 	const SDL_Event &event
 ) {

@@ -49,9 +49,9 @@ public:
 	Controller(const ControllerId &controller_id)
 		: id(controller_id) {}
 
-	bool handle_event(const SDL_Event &event) {
+	bool handle_event(App &app, const SDL_Event &event) {
 		if (m_handler) {
-			return m_handler->handle_event(*this, event);
+			return m_handler->handle_event(app, *this, event);
 		}
 		return false;
 	}

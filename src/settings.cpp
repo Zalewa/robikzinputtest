@@ -20,6 +20,8 @@ void Settings::import_properties(const std::vector<Property> &properties) {
 			this->gizmo_width = property.value;
 		} else if (property.name == "gizmo_height") {
 			this->gizmo_height = property.value;
+		} else if (property.name == "joystick_deadzone") {
+			this->joystick_deadzone = property.value;
 		} else if (property.name == "background_color") {
 			this->background_color = property.value;
 		} else if (property.name == "background_animate") {
@@ -41,6 +43,7 @@ std::vector<Property> Settings::export_properties() const {
 	props.push_back({ "target_fps", target_fps });
 	props.push_back({ "gizmo_width", gizmo_width });
 	props.push_back({ "gizmo_height", gizmo_height });
+	props.push_back({ "joystick_deadzone", joystick_deadzone });
 	props.push_back({ "background_color", background_color });
 	props.push_back({ "background_animate", background_animate });
 	props.push_back({ "background_flash_color", background_flash_color });
