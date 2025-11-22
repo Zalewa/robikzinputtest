@@ -2,9 +2,10 @@
 #include "app.hpp"
 #include "gui_context.hpp"
 #include "gui_overlay_fps.hpp"
+#include "gui_overlay_help.hpp"
+#include "gui_window_settings.hpp"
 #include "sdl_event.hpp"
 #include "settings.hpp"
-#include "version.hpp"
 
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
@@ -12,7 +13,9 @@
 
 namespace robikzinputtest::gui {
 
-static const std::string MAIN_WINDOW_TITLE = app_full_signature();
+using namespace std::literals;
+
+static const auto DURATION_HELP_OVERLAY_SHOW = 5s;
 
 static bool is_gui_demo_key(const SDL_KeyboardEvent &event) {
 	return (
@@ -23,6 +26,17 @@ static bool is_gui_demo_key(const SDL_KeyboardEvent &event) {
 
 static bool is_gui_demo_event(const SDL_Event &event) {
 	return is_gui_demo_key(event.key);
+}
+
+static bool is_gui_settings_key(const SDL_KeyboardEvent &event) {
+	return (
+		event.type == SDL_EVENT_KEY_DOWN
+		&& event.key == SDLK_F5
+	);
+}
+
+static bool is_gui_settings_event(const SDL_Event &event) {
+	return is_gui_settings_key(event.key);
 }
 
 static bool is_gui_defocus_button(const SDL_JoyButtonEvent &event) {
@@ -80,6 +94,9 @@ struct Gui::D {
 	bool imgui_init_renderer = false;
 
 	bool gui_demo_enabled = false;
+	bool gui_settings_enabled = false;
+
+	ExpirableValue<bool> show_help_overlay = { {}, false };
 
 	D(
 		App &app,
@@ -118,6 +135,13 @@ bool Gui::init() {
 	if (!d->imgui_init_renderer)
 		return false;
 
+	if (d->app.settings().show_help_at_start) {
+		d->show_help_overlay = {
+			static_cast<double>(std::chrono::seconds(DURATION_HELP_OVERLAY_SHOW).count()),
+			true,
+		};
+	}
+
 	return true;
 }
 
@@ -141,7 +165,7 @@ void Gui::clear_focus() {
 }
 
 void Gui::grab_focus() {
-	ImGui::SetWindowFocus(MAIN_WINDOW_TITLE.c_str());
+	ImGui::SetWindowFocus(WINDOW_SETTINGS_TITLE.c_str());
 }
 
 bool Gui::is_demo_enabled() const {
@@ -172,6 +196,9 @@ bool Gui::handle_event(SDL_Event &event) {
 	if (is_gui_demo_event(event)) {
 		d->gui_demo_enabled = !d->gui_demo_enabled;
 		return true;
+	} else if (is_gui_settings_event(event)) {
+		d->gui_settings_enabled = !d->gui_settings_enabled;
+		return true;
 	}
 
 	ImGui_ImplSDL3_ProcessEvent(&event);
@@ -181,7 +208,7 @@ bool Gui::handle_event(SDL_Event &event) {
 void Gui::iterate(
 	const FrameTime &frame_time
 ) {
-	GuiContext guictx = { frame_time };
+	GuiContext guictx = { d->app, frame_time };
 	SDL_GetWindowSize(&d->window, &guictx.window_size.x, &guictx.window_size.y);
 
 	ImGuiIO &imgui_io = ImGui::GetIO();
@@ -189,15 +216,22 @@ void Gui::iterate(
 	ImGui_ImplSDL3_NewFrame();
 	ImGui::NewFrame();
 
-	// FPS Overlay
+	// Overlays
+	if (d->show_help_overlay) {
+		if (d->show_help_overlay.countdown(frame_time.delta_seconds)) {
+			d->show_help_overlay.value = false;
+		} else {
+			overlay_help(guictx);
+		}
+	}
 	if (d->app.settings().show_fps) {
 		overlay_fps(guictx);
 	}
 
-	// Main Window
-	ImGui::Begin(MAIN_WINDOW_TITLE.c_str());
-	ImGui::Checkbox("Show FPS", &d->app.settings().show_fps);
-	ImGui::End(); // Main Window
+	// Windows
+	if (d->gui_settings_enabled) {
+		window_settings(guictx);
+	}
 
 	if (d->gui_demo_enabled)
 		ImGui::ShowDemoWindow(&d->gui_demo_enabled);

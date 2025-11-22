@@ -4,11 +4,13 @@
 
 namespace robikzinputtest {
 
+class App;
 struct FrameTime;
 
 namespace gui {
 
 struct GuiContext {
+	App &app;
 	const FrameTime &frameTime;
 	SDL_Point window_size = {0, 0};
 };

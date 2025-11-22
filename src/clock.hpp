@@ -9,6 +9,38 @@ using TimePoint = std::chrono::steady_clock::time_point;
 using Duration = std::chrono::steady_clock::duration;
 using Seconds = double;
 
+template <typename T>
+struct TimestampedValue {
+	TimePoint at;
+	T value;
+
+	operator T&() const { return &value; }
+	operator T&() { return &value; }
+};
+
+struct Countdown {
+	Seconds remaining;
+
+	Countdown() = default;
+	Countdown(Seconds remaining) : remaining(remaining) {}
+
+	/// Return true when countdown expires.
+	bool countdown(Seconds amount) { remaining -= amount; return is_expired(); }
+	bool is_expired() const { return remaining <= 0.0; }
+};
+
+template <typename T>
+struct ExpirableValue : public Countdown {
+	T value;
+
+	ExpirableValue() = default;
+	ExpirableValue(Seconds remaining, T value)
+		: Countdown(remaining), value(value) {}
+
+	operator T&() const { return value; }
+	operator T&() { return value; }
+};
+
 struct FrameTime {
 	TimePoint prevtick;
 	TimePoint currtick;

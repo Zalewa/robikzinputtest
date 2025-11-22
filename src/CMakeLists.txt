@@ -59,6 +59,8 @@ add_executable(
 	gizmo_render.cpp
 	gui.cpp
 	gui_overlay_fps.cpp
+	gui_overlay_help.cpp
+	gui_window_settings.cpp
 	main.cpp
 	properties_file.cpp
 	sdl_settings.cpp
