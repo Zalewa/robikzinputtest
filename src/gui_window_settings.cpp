@@ -23,6 +23,9 @@ void window_settings(const GuiContext &guictx) {
 	// Application info
 	ImGui::Text("%s", app_name().c_str());
 	ImGui::Text("v%s", app_version().c_str());
+	if (ImGui::Button("Quit")) {
+		guictx.app.quit();
+	}
 	ImGui::Separator();
 	// FPS settings
 	ImGui::Checkbox("Show FPS", &guictx.app.settings().show_fps);

@@ -66,6 +66,8 @@ bool is_app_input_priority_event(const SDL_Event &event) {
 
 struct App::D
 {
+	AppRunResult main_loop_result = AppRunResult::CONTINUE;
+
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
 
@@ -171,7 +173,7 @@ AppRunResult App::init(int argc, char *argv[])
 
 AppRunResult App::run()
 {
-	while (1) {
+	while (d->main_loop_result == AppRunResult::CONTINUE) {
 		FrameTime frame_time = d->clock.tick();
 		const AppRunResult event_result = handleEvents(frame_time);
 		if (event_result != AppRunResult::CONTINUE) {
@@ -182,7 +184,7 @@ AppRunResult App::run()
 			return iterate_result;
 		}
 	}
-	return AppRunResult::SUCCESS;
+	return d->main_loop_result;
 }
 
 AppRunResult App::handleEvents(const FrameTime &frame_time)
@@ -351,6 +353,10 @@ void App::close()
 	}
 
 	SDL_Quit();
+}
+
+void App::quit() {
+	d->main_loop_result = AppRunResult::SUCCESS;
 }
 
 void App::recalculate_fps_clock() {
