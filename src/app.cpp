@@ -3,6 +3,7 @@
 #include "clock.hpp"
 #include "controller.hpp"
 #include "controller_system.hpp"
+#include "gizmo.hpp"
 #include "gui.hpp"
 #include "sdl_event.hpp"
 #include "sdl_settings.hpp"
@@ -298,12 +299,21 @@ AppRunResult App::iterate(const FrameTime &frame_time)
 	} else {
 		color_cycle_index = 0;
 	}
-	auto bgcolor = ColorU8<uint8_t>::from(colors[color_cycle_index]);
 
 	// Update arena
 	d->arena->update(*d->controller_system, frame_time);
 
 	// Clear the screen with a color
+	auto bgcolor = ColorU8<uint8_t>::from(colors[color_cycle_index]);
+	if (
+		d->settings.background_flash_on_gizmo_action &&
+		std::any_of(
+			d->arena->gizmos().begin(), d->arena->gizmos().end(),
+			[](auto &it) { return it->is_active(); }
+		)
+	) {
+		bgcolor = ColorU8<uint8_t>::from(d->settings.background_flash_color);
+	}
 	SDL_SetRenderDrawColor(d->renderer, bgcolor[0], bgcolor[1], bgcolor[2], 255);
 	SDL_RenderClear(d->renderer);
 

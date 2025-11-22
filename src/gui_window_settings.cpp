@@ -17,6 +17,7 @@ const std::string WINDOW_SETTINGS_TITLE = "Settings";
 void window_settings(const GuiContext &guictx) {
 	using namespace std::literals;
 
+	ImGui::SetNextWindowSize({ 300.0f, 0.0f }, ImGuiCond_FirstUseEver);
 	ImGui::Begin(WINDOW_SETTINGS_TITLE.c_str());
 
 	// Application info
@@ -68,8 +69,12 @@ void window_settings(const GuiContext &guictx) {
 
 	ImGui::Separator();
 	// Background
+	ImGui::SetNextItemWidth(150.0f);
 	ImGui::ColorEdit3("Background", &guictx.app.settings().background_color.value[0]);
 	ImGui::Checkbox("Cycle Background", &guictx.app.settings().background_animate);
+	ImGui::Checkbox("Flash on Gizmo action", &guictx.app.settings().background_flash_on_gizmo_action);
+	ImGui::SetNextItemWidth(150.0f);
+	ImGui::ColorEdit3("Background Flash", &guictx.app.settings().background_flash_color[0]);
 
 	ImGui::End();
 }

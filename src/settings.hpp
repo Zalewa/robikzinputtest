@@ -22,6 +22,8 @@ struct Settings {
 
 	Color background_color = { 0.0f, 0.20f, 0.0f, 1.0f };
 	bool background_animate = true;
+	Color background_flash_color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	bool background_flash_on_gizmo_action = false;
 
 	void import_properties(const std::vector<Property> &properties);
 	std::vector<Property> export_properties() const;

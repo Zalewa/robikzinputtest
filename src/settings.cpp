@@ -24,6 +24,10 @@ void Settings::import_properties(const std::vector<Property> &properties) {
 			this->background_color = property.value;
 		} else if (property.name == "background_animate") {
 			this->background_animate = property.value;
+		} else if (property.name == "background_flash_color") {
+			this->background_flash_color = property.value;
+		} else if (property.name == "background_flash_on_gizmo_action") {
+			this->background_flash_on_gizmo_action = property.value;
 		}
 	}
 }
@@ -39,6 +43,8 @@ std::vector<Property> Settings::export_properties() const {
 	props.push_back({ "gizmo_height", gizmo_height });
 	props.push_back({ "background_color", background_color });
 	props.push_back({ "background_animate", background_animate });
+	props.push_back({ "background_flash_color", background_flash_color });
+	props.push_back({ "background_flash_on_gizmo_action", background_flash_on_gizmo_action });
 	return props;
 }
 
