@@ -201,6 +201,8 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 #define RBKZIT_LOG_JOYSTICK_AXIS 0
 #define RBKZIT_LOG_JOYSTICK_BALL 0
 #define RBKZIT_LOG_JOYSTICK_BUTTON 0
+#define RBKZIT_LOG_JOYSTICK_ADDED_REMOVED 1
+#define RBKZIT_LOG_JOYSTICK_UPDATE_COMPLETE 0
 #define RBKZIT_LOG_JOYSTICK_HAT 0
 
 	SDL_Event event;
@@ -235,6 +237,32 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 		case SDL_EVENT_WINDOW_RESIZED:
 			// Update arena bounds
 			d->arena->set_bounds({ 0, 0, event.window.data1, event.window.data2 });
+			break;
+		case SDL_EVENT_JOYSTICK_ADDED:
+		case SDL_EVENT_JOYSTICK_REMOVED:
+#if RBKZIT_LOG_JOYSTICK_ADDED_REMOVED
+			std::cerr <<
+				(
+					event.jdevice.type == SDL_EVENT_JOYSTICK_ADDED
+					? "SDL_EVENT_JOYSTICK_ADDED "
+					: "SDL_EVENT_JOYSTICK_REMOVED "
+				)
+				<< "timestamp=" << event.jdevice.timestamp << ", "
+				<< "type=" << event.jdevice.type << ", "
+				<< "which=" << event.jdevice.which << ", "
+				<< "reserved=" << event.jdevice.reserved
+				<< std::endl;
+#endif
+			break;
+		case SDL_EVENT_JOYSTICK_UPDATE_COMPLETE:
+#if RBKZIT_LOG_JOYSTICK_UPDATE_COMPLETE
+			std::cerr << "SDL_EVENT_JOYSTICK_UPDATE_COMPLETE "
+				<< "timestamp=" << event.jdevice.timestamp << ", "
+				<< "type=" << event.jdevice.type << ", "
+				<< "which=" << event.jdevice.which << ", "
+				<< "reserved=" << event.jdevice.reserved
+				<< std::endl;
+#endif
 			break;
 		case SDL_EVENT_JOYSTICK_AXIS_MOTION: {
 #if RBKZIT_LOG_JOYSTICK_AXIS
