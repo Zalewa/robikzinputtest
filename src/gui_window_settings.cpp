@@ -48,13 +48,13 @@ void window_settings(const GuiContext &guictx) {
 
 	// Gizmos
 	const std::string remove_all_gizmos_label =
-		"Remove all Gizmos ("s + std::to_string(guictx.app.arena().gizmos().size()) + ")"s;
+		"Remove all gizmos ("s + std::to_string(guictx.app.arena().gizmos().size()) + ")"s;
 	if (ImGui::Button(remove_all_gizmos_label.c_str()))
 		guictx.app.arena().remove_all_gizmos();
 	ImGui::SetNextItemWidth(60.0f);
 	if (
 		ImGui::DragInt(
-			"Gizmo Width", &guictx.app.settings().gizmo_width,
+			"Gizmo width", &guictx.app.settings().gizmo_width,
 			1, 1, 1000, "%dpx", ImGuiSliderFlags_AlwaysClamp
 		)
 	) {
@@ -63,7 +63,7 @@ void window_settings(const GuiContext &guictx) {
 	ImGui::SetNextItemWidth(60.0f);
 	if (
 		ImGui::DragInt(
-			"Gizmo Height", &guictx.app.settings().gizmo_height,
+			"Gizmo height", &guictx.app.settings().gizmo_height,
 			1, 1, 1000, "%dpx", ImGuiSliderFlags_AlwaysClamp
 		)
 	) {
@@ -74,10 +74,10 @@ void window_settings(const GuiContext &guictx) {
 	// Background
 	ImGui::SetNextItemWidth(150.0f);
 	ImGui::ColorEdit3("Background", &guictx.app.settings().background_color.value[0]);
-	ImGui::Checkbox("Cycle Background", &guictx.app.settings().background_animate);
-	ImGui::Checkbox("Flash on Gizmo action", &guictx.app.settings().background_flash_on_gizmo_action);
+	ImGui::Checkbox("Cycle background", &guictx.app.settings().background_animate);
+	ImGui::Checkbox("Flash on gizmo action", &guictx.app.settings().background_flash_on_gizmo_action);
 	ImGui::SetNextItemWidth(150.0f);
-	ImGui::ColorEdit3("Background Flash", &guictx.app.settings().background_flash_color[0]);
+	ImGui::ColorEdit3("Background flash", &guictx.app.settings().background_flash_color[0]);
 
 	ImGui::End();
 }
