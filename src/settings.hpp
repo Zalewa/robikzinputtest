@@ -9,7 +9,9 @@ struct Property;
 
 struct Settings {
 	bool show_fps = true;
+	bool show_help = false;
 	bool show_help_at_start = true;
+	bool show_settings_at_start = false;
 
 	void import_properties(const std::vector<Property> &properties);
 	std::vector<Property> export_properties() const;

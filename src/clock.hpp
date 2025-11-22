@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <chrono>
 #include <thread>
 
@@ -25,7 +26,7 @@ struct Countdown {
 	Countdown(Seconds remaining) : remaining(remaining) {}
 
 	/// Return true when countdown expires.
-	bool countdown(Seconds amount) { remaining -= amount; return is_expired(); }
+	bool countdown(Seconds amount) { remaining = std::max(0.0, remaining - amount); return is_expired(); }
 	bool is_expired() const { return remaining <= 0.0; }
 };
 

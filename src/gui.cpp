@@ -93,8 +93,8 @@ struct Gui::D {
 	bool imgui_init_platform = false;
 	bool imgui_init_renderer = false;
 
-	bool gui_demo_enabled = false;
-	bool gui_settings_enabled = false;
+	bool show_imgui_demo = false;
+	bool show_settings_window = false;
 
 	ExpirableValue<bool> show_help_overlay = { {}, false };
 
@@ -141,6 +141,7 @@ bool Gui::init() {
 			true,
 		};
 	}
+	d->show_settings_window = d->app.settings().show_settings_at_start;
 
 	return true;
 }
@@ -169,11 +170,11 @@ void Gui::grab_focus() {
 }
 
 bool Gui::is_demo_enabled() const {
-	return d->gui_demo_enabled;
+	return d->show_imgui_demo;
 }
 
 void Gui::set_demo_enabled(bool enabled) {
-	d->gui_demo_enabled = enabled;
+	d->show_imgui_demo = enabled;
 }
 
 bool Gui::handle_event(SDL_Event &event) {
@@ -194,10 +195,10 @@ bool Gui::handle_event(SDL_Event &event) {
 	}
 
 	if (is_gui_demo_event(event)) {
-		d->gui_demo_enabled = !d->gui_demo_enabled;
+		d->show_imgui_demo = !d->show_imgui_demo;
 		return true;
 	} else if (is_gui_settings_event(event)) {
-		d->gui_settings_enabled = !d->gui_settings_enabled;
+		d->show_settings_window = !d->show_settings_window;
 		return true;
 	}
 
@@ -217,8 +218,11 @@ void Gui::iterate(
 	ImGui::NewFrame();
 
 	// Overlays
-	if (d->show_help_overlay) {
-		if (d->show_help_overlay.countdown(frame_time.delta_seconds)) {
+	if (d->show_help_overlay || d->app.settings().show_help) {
+		if (
+			!d->app.settings().show_help &&
+			d->show_help_overlay.countdown(frame_time.delta_seconds)
+		) {
 			d->show_help_overlay.value = false;
 		} else {
 			overlay_help(guictx);
@@ -229,12 +233,12 @@ void Gui::iterate(
 	}
 
 	// Windows
-	if (d->gui_settings_enabled) {
+	if (d->show_settings_window) {
 		window_settings(guictx);
 	}
 
-	if (d->gui_demo_enabled)
-		ImGui::ShowDemoWindow(&d->gui_demo_enabled);
+	if (d->show_imgui_demo)
+		ImGui::ShowDemoWindow(&d->show_imgui_demo);
 
 	ImGui::Render();
 
