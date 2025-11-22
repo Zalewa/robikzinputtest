@@ -157,7 +157,7 @@ AppRunResult App::init(int argc, char *argv[])
 	}
 
 	// Create the arena
-	d->arena = std::make_unique<Arena>();
+	d->arena = std::make_unique<Arena>(*this);
 	d->arena->load_render(*d->renderer);
 	// Set arena bounds to the actual window size
 	SDL_Point window_size;

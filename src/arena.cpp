@@ -1,21 +1,29 @@
 #include "arena.hpp"
 
-#include <SDL3/SDL.h>
+#include "app.hpp"
 #include "controller_system.hpp"
 #include "gizmo.hpp"
 #include "gizmo_render.hpp"
+#include "settings.hpp"
+
+#include <SDL3/SDL.h>
+
 #include <algorithm>
 
 namespace robikzinputtest {
 
-Arena::Arena()
-	: m_bounds({0, 0, 100, 100}) {}
+Arena::Arena(App &app)
+	: m_app(app), m_bounds({0, 0, 100, 100}) {}
 
 std::shared_ptr<Gizmo> Arena::create_gizmo(const ControllerId &controller) {
 	auto gizmo = std::make_shared<Gizmo>();
 	gizmo->set_controller(controller);
 	gizmo->m_position = find_free_position();
-	m_gizmoz_to_load.push(gizmo);
+	gizmo->m_size = {
+		static_cast<float>(m_app.settings().gizmo_width),
+		static_cast<float>(m_app.settings().gizmo_height),
+	};
+	m_gizmos_to_load.push(gizmo);
 	m_gizmos.push_back(gizmo);
 	return gizmo;
 }
@@ -42,6 +50,16 @@ void Arena::remove_all_gizmos() {
 		remove_gizmo(*it);
 		it = m_gizmos.begin();
 	}
+}
+
+void Arena::set_gizmos_width(int px) {
+	for (auto &gizmo : m_gizmos)
+		gizmo->m_size.x = static_cast<float>(px);
+}
+
+void Arena::set_gizmos_height(int px) {
+	for (auto &gizmo : m_gizmos)
+		gizmo->m_size.y = static_cast<float>(px);
 }
 
 void Arena::set_bounds(const SDL_Rect &bounds) {
@@ -81,10 +99,10 @@ void Arena::load_render(Renderer &renderer) {
 
 void Arena::render(Renderer &renderer) {
 	// Load any pending gizmos
-	while (!m_gizmoz_to_load.empty()) {
-		auto gizmo = m_gizmoz_to_load.front();
+	while (!m_gizmos_to_load.empty()) {
+		auto gizmo = m_gizmos_to_load.front();
 		gizmo->renderer().load_render(renderer);
-		m_gizmoz_to_load.pop();
+		m_gizmos_to_load.pop();
 	}
 
 	// Draw arena bounds

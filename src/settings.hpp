@@ -13,6 +13,9 @@ struct Settings {
 	bool show_help_at_start = true;
 	bool show_settings_at_start = false;
 
+	int gizmo_width = 20;
+	int gizmo_height = 20;
+
 	void import_properties(const std::vector<Property> &properties);
 	std::vector<Property> export_properties() const;
 };

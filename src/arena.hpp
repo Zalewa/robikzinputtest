@@ -9,6 +9,7 @@
 
 namespace robikzinputtest {
 
+class App;
 class ControllerSystem;
 class Gizmo;
 struct ControllerId;
@@ -16,13 +17,15 @@ struct ControllerId;
 class Arena : public Renderable
 {
 public:
-	Arena();
+	Arena(App &app);
 
 	std::shared_ptr<Gizmo> create_gizmo(const ControllerId &controller);
 	std::shared_ptr<Gizmo> find_gizmo_for_controller(const ControllerId &controller);
 	void remove_gizmo(std::shared_ptr<Gizmo> gizmo);
 	void remove_all_gizmos();
 	const std::vector<std::shared_ptr<Gizmo>> &gizmos() const { return m_gizmos; }
+	void set_gizmos_width(int px);
+	void set_gizmos_height(int px);
 
 	void set_bounds(const SDL_Rect &bounds);
 
@@ -32,8 +35,10 @@ public:
 	void update(ControllerSystem &controller_system, const FrameTime &frame_time);
 
 private:
+	App &m_app;
+
 	std::vector<std::shared_ptr<Gizmo>> m_gizmos;
-	std::queue<std::shared_ptr<Gizmo>> m_gizmoz_to_load;
+	std::queue<std::shared_ptr<Gizmo>> m_gizmos_to_load;
 	SDL_FRect m_bounds;
 
 	SDL_FPoint clamp_to_bounds(const SDL_FPoint &point) const;

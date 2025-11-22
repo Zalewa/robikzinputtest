@@ -18,18 +18,41 @@ void window_settings(const GuiContext &guictx) {
 	using namespace std::literals;
 
 	ImGui::Begin(WINDOW_SETTINGS_TITLE.c_str());
+
+	// Application info
 	ImGui::Text("%s", app_name().c_str());
 	ImGui::Text("v%s", app_version().c_str());
 	ImGui::Separator();
+	// UI settings
 	ImGui::Checkbox("Show FPS", &guictx.app.settings().show_fps);
 	ImGui::Checkbox("Show help", &guictx.app.settings().show_help);
 	ImGui::Checkbox("Show help at start", &guictx.app.settings().show_help_at_start);
 	ImGui::Checkbox("Show settings at start", &guictx.app.settings().show_settings_at_start);
 	ImGui::Separator();
+	// Gizmos
 	const std::string remove_all_gizmos_label =
 		"Remove all Gizmos ("s + std::to_string(guictx.app.arena().gizmos().size()) + ")"s;
 	if (ImGui::Button(remove_all_gizmos_label.c_str()))
 		guictx.app.arena().remove_all_gizmos();
+	ImGui::SetNextItemWidth(60.0f);
+	if (
+		ImGui::DragInt(
+			"Gizmo Width", &guictx.app.settings().gizmo_width,
+			1, 1, 1000, "%dpx", ImGuiSliderFlags_AlwaysClamp
+		)
+	) {
+		guictx.app.arena().set_gizmos_width(guictx.app.settings().gizmo_width);
+	}
+	ImGui::SetNextItemWidth(60.0f);
+	if (
+		ImGui::DragInt(
+			"Gizmo Height", &guictx.app.settings().gizmo_height,
+			1, 1, 1000, "%dpx", ImGuiSliderFlags_AlwaysClamp
+		)
+	) {
+		guictx.app.arena().set_gizmos_height(guictx.app.settings().gizmo_height);
+	}
+
 	ImGui::End();
 }
 

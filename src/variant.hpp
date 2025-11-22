@@ -9,6 +9,7 @@ public:
 	Variant() : m_valid(false) {}
 	Variant(std::string s) : m_value(s) {}
 	Variant(bool b) : m_value(b ? "true" : "false") {}
+	Variant(int32_t i) : m_value(std::to_string(i)) {}
 	Variant(int64_t i) : m_value(std::to_string(i)) {}
 	Variant(double d) : m_value(std::to_string(d)) {}
 

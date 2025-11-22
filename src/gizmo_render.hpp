@@ -15,7 +15,6 @@ public:
 	SDL_Color m_frame_color = { 255, 96, 96, 255 };
 	SDL_Color m_active_color = { 0, 255, 0, 255 };
 	SDL_Color m_active_frame_color = { 96, 255, 96, 255 };
-	SDL_FPoint m_size = { 20.0f, 20.0f };
 
 	GizmoRender(Gizmo &gizmo)
 		: m_gizmo(gizmo) {}
