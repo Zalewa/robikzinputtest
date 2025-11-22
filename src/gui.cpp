@@ -35,8 +35,16 @@ static bool is_gui_settings_key(const SDL_KeyboardEvent &event) {
 	);
 }
 
+static bool is_gui_settings_joystick_button(const SDL_JoyButtonEvent &event) {
+	return (
+		event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN
+		&& event.button == 7
+	);
+}
+
 static bool is_gui_settings_event(const SDL_Event &event) {
-	return is_gui_settings_key(event.key);
+	return is_gui_settings_key(event.key)
+		|| is_gui_settings_joystick_button(event.jbutton);
 }
 
 static bool is_gui_defocus_button(const SDL_JoyButtonEvent &event) {

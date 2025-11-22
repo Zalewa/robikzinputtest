@@ -12,7 +12,7 @@ void overlay_help(const GuiContext &guictx) {
 	ImGui::SetNextWindowPos({ 0, 0 });
 	ImGui::Begin("HELP Overlay", nullptr, imgui::overlay_flags);
 	ImGui::Text(
-		"Press F5 to open settings\n"
+		"Press F5 or START to open settings\n"
 		"Press ENTER or SPACE to spawn keyboard Gizmo\n"
 		"Press any button on controller to spawn controller Gizmo\n"
 		"Press CTRL+Q to quit\n"
