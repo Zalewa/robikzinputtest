@@ -21,6 +21,7 @@ public:
 	std::shared_ptr<Gizmo> create_gizmo(const ControllerId &controller);
 	std::shared_ptr<Gizmo> find_gizmo_for_controller(const ControllerId &controller);
 	void remove_gizmo(std::shared_ptr<Gizmo> gizmo);
+	void remove_all_gizmos();
 	const std::vector<std::shared_ptr<Gizmo>> &gizmos() const { return m_gizmos; }
 
 	void set_bounds(const SDL_Rect &bounds);

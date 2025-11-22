@@ -37,6 +37,13 @@ void Arena::remove_gizmo(std::shared_ptr<Gizmo> gizmo) {
 	}
 }
 
+void Arena::remove_all_gizmos() {
+	for (auto it = m_gizmos.begin(); it != m_gizmos.end(); ) {
+		remove_gizmo(*it);
+		it = m_gizmos.begin();
+	}
+}
+
 void Arena::set_bounds(const SDL_Rect &bounds) {
 	SDL_RectToFRect(&bounds, &m_bounds);
 	// Clamp all gizmos to the new bounds

@@ -6,6 +6,7 @@
 
 namespace robikzinputtest {
 
+class Arena;
 struct Settings;
 
 enum class AppRunResult {
@@ -25,6 +26,7 @@ public:
 	AppRunResult handleEvents(const FrameTime &frame_time);
 	void close();
 
+	Arena &arena();
 	Settings &settings();
 
 private:

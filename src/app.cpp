@@ -343,6 +343,10 @@ void App::close()
 	SDL_Quit();
 }
 
+Arena &App::arena() {
+	return *d->arena;
+}
+
 Settings &App::settings() {
 	return d->settings;
 }
