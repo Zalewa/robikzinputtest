@@ -14,6 +14,7 @@
 #include <imgui_impl_sdlrenderer3.h>
 #include <SDL3/SDL.h>
 
+#include <algorithm>
 #include <array>
 #include <iostream>
 #include <string>
@@ -127,8 +128,8 @@ AppRunResult App::init(int argc, char *argv[])
 	// Initialize controller system
 	d->controller_system = std::make_unique<ControllerSystem>();
 
-	// Limit clock to 60FPS (TODO: for now)
-	d->clock.set_resolution(std::chrono::microseconds(16666));
+	// Limit clock to target FPS
+	recalculate_fps_clock();
 
 	// Create a window
 	const std::string title = app_full_signature();
@@ -341,6 +342,16 @@ void App::close()
 	}
 
 	SDL_Quit();
+}
+
+void App::recalculate_fps_clock() {
+	const double reasonably_clamped_target_fps = std::max<double>(10.0, d->settings.target_fps);
+	d->settings.target_fps = reasonably_clamped_target_fps;
+	d->clock.set_resolution(
+		std::chrono::round<std::chrono::microseconds>(
+			std::chrono::duration<double>(1.0 / reasonably_clamped_target_fps)
+		)
+	);
 }
 
 Arena &App::arena() {

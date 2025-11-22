@@ -17,12 +17,14 @@ public:
 	operator bool() const { return as_bool(); }
 	operator int32_t() const { return as_int32(); }
 	operator int64_t() const { return as_int64(); }
+	operator float() const { return as_float(); }
 	operator double() const { return as_double(); }
 
 	const std::string &as_string() const { return m_value; }
 	bool as_bool() const;
 	int32_t as_int32() const;
 	int64_t as_int64() const;
+	float as_float() const;
 	double as_double() const;
 
 	bool valid() const { return m_valid; }

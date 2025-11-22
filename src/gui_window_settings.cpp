@@ -23,8 +23,19 @@ void window_settings(const GuiContext &guictx) {
 	ImGui::Text("%s", app_name().c_str());
 	ImGui::Text("v%s", app_version().c_str());
 	ImGui::Separator();
-	// UI settings
+	// FPS settings
 	ImGui::Checkbox("Show FPS", &guictx.app.settings().show_fps);
+	ImGui::SetNextItemWidth(80.0f);
+	if (
+		ImGui::DragFloat(
+			"Target FPS", &guictx.app.settings().target_fps,
+			1.0, 10.0f, 10000.0f, "%.3fFPS", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_AlwaysClamp
+		)
+	) {
+		guictx.app.recalculate_fps_clock();
+	}
+	ImGui::Separator();
+	// UI settings
 	ImGui::Checkbox("Show help", &guictx.app.settings().show_help);
 	ImGui::Checkbox("Show help at start", &guictx.app.settings().show_help_at_start);
 	ImGui::Checkbox("Show settings at start", &guictx.app.settings().show_settings_at_start);

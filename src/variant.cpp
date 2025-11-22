@@ -25,6 +25,10 @@ int64_t Variant::as_int64() const {
 	return std::strtoll(this->m_value.c_str(), nullptr, 10);
 }
 
+float Variant::as_float() const {
+	return std::strtof(this->m_value.c_str(), nullptr);
+}
+
 double Variant::as_double() const {
 	return std::strtod(this->m_value.c_str(), nullptr);
 }

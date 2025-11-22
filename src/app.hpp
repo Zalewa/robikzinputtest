@@ -26,6 +26,9 @@ public:
 	AppRunResult handleEvents(const FrameTime &frame_time);
 	void close();
 
+	/// Limit the tickrate clock to target FPS.
+	void recalculate_fps_clock();
+
 	Arena &arena();
 	Settings &settings();
 
