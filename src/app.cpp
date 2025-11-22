@@ -17,7 +17,10 @@
 
 #include <algorithm>
 #include <array>
+#include <functional>
 #include <iostream>
+#include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -64,6 +67,8 @@ bool is_app_input_priority_event(const SDL_Event &event) {
 }
 } // namespace
 
+using JoystickUPtr = std::unique_ptr<SDL_Joystick, std::function<void(SDL_Joystick *)>>;
+
 struct App::D
 {
 	AppRunResult main_loop_result = AppRunResult::CONTINUE;
@@ -72,6 +77,8 @@ struct App::D
 	SDL_Renderer* renderer = nullptr;
 
 	Settings settings;
+
+	std::map<SDL_JoystickID, JoystickUPtr> joysticks;
 
 	std::unique_ptr<Arena> arena;
 	std::unique_ptr<ControllerSystem> controller_system;
@@ -253,6 +260,19 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 				<< "reserved=" << event.jdevice.reserved
 				<< std::endl;
 #endif
+			if (event.type == SDL_EVENT_JOYSTICK_ADDED) {
+				SDL_Joystick *joystick = SDL_OpenJoystick(event.jdevice.which);
+				if (joystick) {
+					d->joysticks.insert(
+						{
+							event.jdevice.which,
+							JoystickUPtr(joystick, &SDL_CloseJoystick)
+						}
+					);
+				}
+			} else if (event.type == SDL_EVENT_JOYSTICK_REMOVED) {
+				d->joysticks.erase(event.jdevice.which);
+			}
 			break;
 		case SDL_EVENT_JOYSTICK_UPDATE_COMPLETE:
 #if RBKZIT_LOG_JOYSTICK_UPDATE_COMPLETE
