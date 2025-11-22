@@ -71,7 +71,7 @@ struct App::D
 
 	std::unique_ptr<Arena> arena;
 	std::unique_ptr<ControllerSystem> controller_system;
-	std::unique_ptr<Gui> gui;
+	std::unique_ptr<gui::Gui> gui;
 
 	EngineClock clock;
 
@@ -151,7 +151,7 @@ AppRunResult App::init(int argc, char *argv[])
 	}
 
 	// Create GUI
-	d->gui = std::make_unique<Gui>(*this, *d->window, *d->renderer);
+	d->gui = std::make_unique<gui::Gui>(*this, *d->window, *d->renderer);
 	if (!d->gui->init()) {
 		return AppRunResult::FAILURE;
 	}

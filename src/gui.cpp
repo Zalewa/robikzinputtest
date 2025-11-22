@@ -1,5 +1,7 @@
 #include "gui.hpp"
 #include "app.hpp"
+#include "gui_context.hpp"
+#include "gui_overlay_fps.hpp"
 #include "sdl_event.hpp"
 #include "settings.hpp"
 #include "version.hpp"
@@ -8,7 +10,7 @@
 #include <imgui_impl_sdl3.h>
 #include <imgui_impl_sdlrenderer3.h>
 
-namespace robikzinputtest {
+namespace robikzinputtest::gui {
 
 static const std::string MAIN_WINDOW_TITLE = app_full_signature();
 
@@ -179,8 +181,8 @@ bool Gui::handle_event(SDL_Event &event) {
 void Gui::iterate(
 	const FrameTime &frame_time
 ) {
-	SDL_Point window_size = {0, 0};
-	SDL_GetWindowSize(&d->window, &window_size.x, &window_size.y);
+	GuiContext guictx = { frame_time };
+	SDL_GetWindowSize(&d->window, &guictx.window_size.x, &guictx.window_size.y);
 
 	ImGuiIO &imgui_io = ImGui::GetIO();
 	ImGui_ImplSDLRenderer3_NewFrame();
@@ -189,19 +191,7 @@ void Gui::iterate(
 
 	// FPS Overlay
 	if (d->app.settings().show_fps) {
-		// TODO there is a focus loss issue when the fps indicator is shown
-		ImGui::SetNextWindowPos(
-			{ static_cast<float>(window_size.x), 0 },
-			0,
-			{ 1.0, 0 }
-		);
-		ImGui::Begin("FPS Overlay", nullptr, inert_window_flags);
-		ImGui::Text(
-			"%.3f ms/frame (%.1f FPS)",
-			1000.0f / imgui_io.Framerate,
-			imgui_io.Framerate
-		);
-		ImGui::End(); // FPS Overlay
+		overlay_fps(guictx);
 	}
 
 	// Main Window
@@ -217,4 +207,4 @@ void Gui::iterate(
 	ImGui_ImplSDLRenderer3_RenderDrawData(ImGui::GetDrawData(), &d->renderer);
 }
 
-}
+} // namespace robikzinputtest::gui
