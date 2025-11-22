@@ -12,12 +12,15 @@
 
 namespace robikzinputtest::gui {
 
-const std::string WINDOW_SETTINGS_TITLE = app_full_signature();
+const std::string WINDOW_SETTINGS_TITLE = "Settings";
 
 void window_settings(const GuiContext &guictx) {
 	using namespace std::literals;
 
 	ImGui::Begin(WINDOW_SETTINGS_TITLE.c_str());
+	ImGui::Text("%s", app_name().c_str());
+	ImGui::Text("v%s", app_version().c_str());
+	ImGui::Separator();
 	ImGui::Checkbox("Show FPS", &guictx.app.settings().show_fps);
 	ImGui::Checkbox("Show help", &guictx.app.settings().show_help);
 	ImGui::Checkbox("Show help at start", &guictx.app.settings().show_help_at_start);
