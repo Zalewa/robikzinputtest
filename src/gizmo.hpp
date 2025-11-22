@@ -27,6 +27,7 @@ public:
 
 	Gizmo();
 
+	std::string name() const;
 	bool is_active() const { return m_action_started_at.has_value(); }
 
 	const ControllerId &controller() const { return m_controller; }
