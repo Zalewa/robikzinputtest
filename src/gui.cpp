@@ -127,6 +127,7 @@ bool Gui::init() {
 	ImGuiIO &io = ImGui::GetIO();
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 	io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+	io.IniFilename = nullptr; // disable spawn of imgui.ini
 
 	d->imgui_init_platform = ImGui_ImplSDL3_InitForSDLRenderer(&d->window, &d->renderer);
 	if (!d->imgui_init_platform)
