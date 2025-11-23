@@ -247,9 +247,7 @@ void Gui::iterate(
 			overlay_help(guictx);
 		}
 	}
-	if (d->app.settings().show_fps) {
-		overlay_fps(guictx);
-	}
+	overlay_fps(guictx);
 
 	// Windows
 	if (d->app.settings().show_program_log) {

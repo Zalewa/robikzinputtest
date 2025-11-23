@@ -27,8 +27,10 @@ void window_settings(const GuiContext &guictx, bool *p_open) {
 		guictx.app.quit();
 	}
 	ImGui::Separator();
+
 	// FPS settings
 	ImGui::Checkbox("Show FPS", &guictx.app.settings().show_fps);
+	ImGui::Checkbox("Show UI frame counter", &guictx.app.settings().show_ui_frame_counter);
 	ImGui::SetNextItemWidth(80.0f);
 	if (
 		ImGui::DragFloat(

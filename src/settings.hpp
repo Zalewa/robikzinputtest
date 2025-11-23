@@ -11,6 +11,7 @@ struct Property;
 
 struct Settings {
 	bool show_fps = true;
+	bool show_ui_frame_counter = true;
 	bool show_help = false;
 	bool show_help_at_start = true;
 	bool show_settings_at_start = false;
