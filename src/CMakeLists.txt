@@ -56,11 +56,14 @@ add_executable(
 	color.cpp
 	controller_handler.cpp
 	controller_system.cpp
+	logger.cpp
 	gizmo.cpp
 	gizmo_render.cpp
 	gui.cpp
+	gui_logbox.cpp
 	gui_overlay_fps.cpp
 	gui_overlay_help.cpp
+	gui_window_program_log.cpp
 	gui_window_settings.cpp
 	main.cpp
 	properties_file.cpp

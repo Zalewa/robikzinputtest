@@ -14,11 +14,11 @@ namespace robikzinputtest::gui {
 
 const std::string WINDOW_SETTINGS_TITLE = "Settings";
 
-void window_settings(const GuiContext &guictx) {
+void window_settings(const GuiContext &guictx, bool *p_open) {
 	using namespace std::literals;
 
 	ImGui::SetNextWindowSize({ 300.0f, 0.0f }, ImGuiCond_FirstUseEver);
-	ImGui::Begin(WINDOW_SETTINGS_TITLE.c_str());
+	ImGui::Begin(WINDOW_SETTINGS_TITLE.c_str(), p_open);
 
 	// Application info
 	ImGui::Text("%s", app_name().c_str());
@@ -44,6 +44,7 @@ void window_settings(const GuiContext &guictx) {
 	ImGui::Checkbox("Show help", &guictx.app.settings().show_help);
 	ImGui::Checkbox("Show help at start", &guictx.app.settings().show_help_at_start);
 	ImGui::Checkbox("Show settings at start", &guictx.app.settings().show_settings_at_start);
+	ImGui::Checkbox("Show program log", &guictx.app.settings().show_program_log);
 	ImGui::Separator();
 
 	// Gizmos

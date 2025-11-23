@@ -14,6 +14,7 @@ struct Settings {
 	bool show_help = false;
 	bool show_help_at_start = true;
 	bool show_settings_at_start = false;
+	bool show_program_log = false;
 
 	float target_fps = 60.0f;
 

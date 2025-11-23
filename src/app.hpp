@@ -7,6 +7,7 @@
 namespace robikzinputtest {
 
 class Arena;
+class Logger;
 struct Settings;
 
 enum class AppRunResult {
@@ -37,6 +38,7 @@ public:
 	void recalculate_fps_clock();
 
 	Arena &arena();
+	Logger &logger();
 	Settings &settings();
 
 private:

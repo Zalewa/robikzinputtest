@@ -5,6 +5,7 @@
 #include "controller_system.hpp"
 #include "gizmo.hpp"
 #include "gui.hpp"
+#include "logger.hpp"
 #include "sdl_event.hpp"
 #include "sdl_settings.hpp"
 #include "settings.hpp"
@@ -72,6 +73,7 @@ using JoystickUPtr = std::unique_ptr<SDL_Joystick, std::function<void(SDL_Joysti
 struct App::D
 {
 	AppRunResult main_loop_result = AppRunResult::CONTINUE;
+	Logger logger;
 
 	SDL_Window* window = nullptr;
 	SDL_Renderer* renderer = nullptr;
@@ -419,6 +421,10 @@ void App::recalculate_fps_clock() {
 
 Arena &App::arena() {
 	return *d->arena;
+}
+
+Logger &App::logger() {
+	return d->logger;
 }
 
 Settings &App::settings() {

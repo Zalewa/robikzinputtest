@@ -1,8 +1,11 @@
 #include "gui.hpp"
 #include "app.hpp"
+#include "logger.hpp"
 #include "gui_context.hpp"
+#include "gui_log.hpp"
 #include "gui_overlay_fps.hpp"
 #include "gui_overlay_help.hpp"
+#include "gui_window_program_log.hpp"
 #include "gui_window_settings.hpp"
 #include "sdl_event.hpp"
 #include "settings.hpp"
@@ -84,18 +87,15 @@ static bool is_imgui_swallowing_event(const SDL_Event &event) {
 		|| (sdl::is_mouse_event(event) && io.WantCaptureMouse);
 }
 
-static constexpr ImGuiWindowFlags inert_window_flags = 0
-	| ImGuiWindowFlags_NoDecoration
-	| ImGuiWindowFlags_NoBackground
-	| ImGuiWindowFlags_NoInputs
-	| ImGuiWindowFlags_NoMove
-	| ImGuiWindowFlags_NoSavedSettings
-	;
-
 struct Gui::D {
 	App &app;
 	SDL_Window &window;
 	SDL_Renderer &renderer;
+
+	HandlerId log_handler_id = 0;
+	Log log;
+
+	std::unique_ptr<WindowProgramLog> window_program_log;
 
 	bool imgui_init_context = false;
 	bool imgui_init_platform = false;
@@ -127,6 +127,12 @@ Gui::~Gui() {
 }
 
 bool Gui::init() {
+	d->log_handler_id = d->app.logger().on_logrecord.add(
+		[&](const LogRecord &record) {
+			d->log.add(record);
+		}
+	);
+
 	IMGUI_CHECKVERSION();
 	d->imgui_init_context = ImGui::CreateContext() != nullptr;
 	if (!d->imgui_init_context)
@@ -152,10 +158,14 @@ bool Gui::init() {
 	}
 	d->show_settings_window = d->app.settings().show_settings_at_start;
 
+	d->window_program_log = std::make_unique<WindowProgramLog>(d->log);
+
 	return true;
 }
 
 void Gui::close() {
+	d->app.logger().on_logrecord.remove(d->log_handler_id);
+	d->window_program_log.reset();
 	if (d->imgui_init_renderer) {
 		ImGui_ImplSDLRenderer3_Shutdown();
 		d->imgui_init_renderer = false;
@@ -242,8 +252,11 @@ void Gui::iterate(
 	}
 
 	// Windows
+	if (d->app.settings().show_program_log) {
+		d->window_program_log->draw(guictx);
+	}
 	if (d->show_settings_window) {
-		window_settings(guictx);
+		window_settings(guictx, &d->show_settings_window);
 	}
 
 	if (d->show_imgui_demo)
