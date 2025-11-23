@@ -262,6 +262,16 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 				<< "reserved=" << event.jdevice.reserved
 				<< std::endl;
 #endif
+			d->logger.info() <<
+				(
+					event.jdevice.type == SDL_EVENT_JOYSTICK_ADDED
+					? "JOYSTICK_ADDED "
+					: "JOYSTICK_REMOVED "
+				)
+				<< "timestamp=" << event.jdevice.timestamp << ", "
+				<< "which=" << event.jdevice.which << ", "
+				<< "type=" << event.jdevice.type
+				<< std::endl;
 			if (event.type == SDL_EVENT_JOYSTICK_ADDED) {
 				SDL_Joystick *joystick = SDL_OpenJoystick(event.jdevice.which);
 				if (joystick) {
@@ -295,6 +305,13 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 				<< "value=" << event.jaxis.value
 				<< std::endl;
 #endif
+			d->logger.info() <<
+				"JOYSTICK_AXIS_MOTION "
+				<< "timestamp=" << event.jaxis.timestamp << ", "
+				<< "which=" << event.jaxis.which << ", "
+				<< "axis=" << static_cast<int32_t>(event.jaxis.axis) << ", "
+				<< "value=" << event.jaxis.value
+				<< std::endl;
 			break;
 		}
 		case SDL_EVENT_JOYSTICK_BALL_MOTION:
@@ -315,10 +332,33 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 				<< "down=" << static_cast<int32_t>(event.jbutton.down)
 				<< std::endl;
 #endif
+			d->logger.info() <<
+				"JOYSTICK_BUTTON_DOWN "
+				<< "timestamp=" << event.jaxis.timestamp << ", "
+				<< "which=" << event.jaxis.which << ", "
+				<< "button=" << static_cast<int32_t>(event.jbutton.button) << ", "
+				<< "down=" << static_cast<int32_t>(event.jbutton.down)
+				<< std::endl;
 			if (is_joystick_gizmo_create_key(event.jbutton)) {
 				Controller &controller = d->controller_system->for_joystick(event.jbutton.which);
 				spawn_controller_gizmo(controller);
 			}
+			break;
+		case SDL_EVENT_JOYSTICK_BUTTON_UP:
+#if RBKZIT_LOG_JOYSTICK_BUTTON
+			std::cerr << "SDL_EVENT_JOYSTICK_BUTTON_UP "
+				<< "timestamp=" << event.jbutton.timestamp << ", "
+				<< "button=" << static_cast<int32_t>(event.jbutton.button) << ", "
+				<< "down=" << static_cast<int32_t>(event.jbutton.down)
+				<< std::endl;
+#endif
+			d->logger.info() <<
+				"JOYSTICK_BUTTON_UP "
+				<< "timestamp=" << event.jaxis.timestamp << ", "
+				<< "which=" << event.jaxis.which << ", "
+				<< "button=" << static_cast<int32_t>(event.jbutton.button) << ", "
+				<< "down=" << static_cast<int32_t>(event.jbutton.down)
+				<< std::endl;
 			break;
 		}
 		// Now pass the event to controllers
