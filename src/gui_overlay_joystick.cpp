@@ -19,10 +19,11 @@ void overlay_joystick(const GuiContext &guictx) {
 	);
 	ImGui::SetNextWindowSize({ 0, 0 }, ImGuiCond_Always);
 	ImGui::Begin("Joystick Overlay", nullptr, imgui::overlay_flags);
-	ImGui::Text("Joystick Count: %zu", guictx.app.joysticks().size());
+	const OpenedJoysticksMap &joysticks = guictx.app.joysticks();
+	ImGui::Text("Joystick Count: %zu", joysticks.size());
 	ImGui::Text("Joystick Deadzone: %d", guictx.app.settings().joystick_deadzone);
 	SDL_LockJoysticks();
-	for (const auto &joypair : guictx.app.joysticks()) {
+	for (const auto &joypair : joysticks) {
 		auto joy_id = joypair.first;
 		auto joystick = joypair.second.get();
 
