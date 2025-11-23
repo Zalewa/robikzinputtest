@@ -68,8 +68,6 @@ bool is_app_input_priority_event(const SDL_Event &event) {
 }
 } // namespace
 
-using JoystickUPtr = std::unique_ptr<SDL_Joystick, std::function<void(SDL_Joystick *)>>;
-
 struct App::D
 {
 	AppRunResult main_loop_result = AppRunResult::CONTINUE;
@@ -80,7 +78,7 @@ struct App::D
 
 	Settings settings;
 
-	std::map<SDL_JoystickID, JoystickUPtr> joysticks;
+	OpenedJoysticksMap joysticks;
 
 	std::unique_ptr<Arena> arena;
 	std::unique_ptr<ControllerSystem> controller_system;
@@ -469,6 +467,10 @@ Logger &App::logger() {
 
 Settings &App::settings() {
 	return d->settings;
+}
+
+const OpenedJoysticksMap &App::joysticks() const {
+	return d->joysticks;
 }
 
 } // namespace robikzinputtest

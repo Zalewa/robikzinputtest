@@ -5,6 +5,7 @@
 #include "gui_log.hpp"
 #include "gui_overlay_fps.hpp"
 #include "gui_overlay_help.hpp"
+#include "gui_overlay_joystick.hpp"
 #include "gui_window_program_log.hpp"
 #include "gui_window_settings.hpp"
 #include "sdl_event.hpp"
@@ -248,6 +249,9 @@ void Gui::iterate(
 		}
 	}
 	overlay_fps(guictx);
+	if (d->app.settings().show_joystick_info) {
+		overlay_joystick(guictx);
+	}
 
 	// Windows
 	if (d->app.settings().show_program_log) {

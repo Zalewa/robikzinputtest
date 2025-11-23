@@ -16,6 +16,7 @@ struct Settings {
 	bool show_help_at_start = true;
 	bool show_settings_at_start = false;
 	bool show_program_log = false;
+	bool show_joystick_info = false;
 
 	float target_fps = 60.0f;
 

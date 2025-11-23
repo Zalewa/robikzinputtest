@@ -63,6 +63,7 @@ add_executable(
 	gui_logbox.cpp
 	gui_overlay_fps.cpp
 	gui_overlay_help.cpp
+	gui_overlay_joystick.cpp
 	gui_window_program_log.cpp
 	gui_window_settings.cpp
 	main.cpp

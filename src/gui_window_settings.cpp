@@ -47,6 +47,7 @@ void window_settings(const GuiContext &guictx, bool *p_open) {
 	ImGui::Checkbox("Show help at start", &guictx.app.settings().show_help_at_start);
 	ImGui::Checkbox("Show settings at start", &guictx.app.settings().show_settings_at_start);
 	ImGui::Checkbox("Show program log", &guictx.app.settings().show_program_log);
+	ImGui::Checkbox("Show joystick info", &guictx.app.settings().show_joystick_info);
 	ImGui::Separator();
 
 	// Gizmos

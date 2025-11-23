@@ -2,6 +2,10 @@
 
 #include "clock.hpp"
 
+#include <SDL3/SDL.h>
+
+#include <functional>
+#include <map>
 #include <memory>
 
 namespace robikzinputtest {
@@ -9,6 +13,9 @@ namespace robikzinputtest {
 class Arena;
 class Logger;
 struct Settings;
+
+using JoystickUPtr = std::unique_ptr<SDL_Joystick, std::function<void(SDL_Joystick *)>>;
+using OpenedJoysticksMap = std::map<SDL_JoystickID, JoystickUPtr>;
 
 enum class AppRunResult {
 	SUCCESS,
@@ -40,6 +47,7 @@ public:
 	Arena &arena();
 	Logger &logger();
 	Settings &settings();
+	const OpenedJoysticksMap &joysticks() const;
 
 private:
 	struct D;
