@@ -17,6 +17,7 @@ void overlay_joystick(const GuiContext &guictx) {
 		0,
 		{ 1.0, 0 }
 	);
+	ImGui::SetNextWindowSize({ 0, 0 }, ImGuiCond_Always);
 	ImGui::Begin("Joystick Overlay", nullptr, imgui::overlay_flags);
 	ImGui::Text("Joystick Count: %zu", guictx.app.joysticks().size());
 	ImGui::Text("Joystick Deadzone: %d", guictx.app.settings().joystick_deadzone);

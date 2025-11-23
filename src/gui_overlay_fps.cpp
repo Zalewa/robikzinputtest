@@ -26,6 +26,7 @@ void overlay_fps(const GuiContext &guictx) {
 		0,
 		{ 1.0, 0 }
 	);
+	ImGui::SetNextWindowSize({ 0, 0 }, ImGuiCond_Always);
 	ImGui::Begin("FPS Overlay", nullptr, imgui::overlay_flags);
 	if (show_fps) {
 		ImGui::Text(
