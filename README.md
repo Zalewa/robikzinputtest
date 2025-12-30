@@ -16,8 +16,8 @@ The app can be installed by building it from source.
 
 ### Requirements
 
-- CMake 3.28 or newer
-- C++17-compatible compiler
+- CMake 3.22 or newer
+- C++17 compatible compiler
 - Internet connection for downloading dependencies:
     - SDL3
     - Dear ImGui
