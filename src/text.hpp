@@ -29,4 +29,13 @@ inline std::string rtrim(std::string s) {
 inline std::string trim(std::string s) {
 	return ltrim(rtrim(s));
 }
+
+inline std::string tolower(std::string s) {
+	std::transform(
+		s.begin(), s.end(), s.begin(),
+		[](unsigned char c) { return std::tolower(c); }
+	);
+	return s;
+}
+
 } // namespace robikzinputtest:text
