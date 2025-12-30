@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL3/SDL.h>
+
 #include <algorithm>
 #include <chrono>
 #include <thread>
@@ -76,7 +78,11 @@ public:
 	const FrameTime tick() {
 		// Sleep until the next tick target time.
 		auto target = m_lasttick + m_resolution;
-		std::this_thread::sleep_until(target);
+		auto sleep_time = target - std::chrono::steady_clock::now();
+		if (sleep_time > std::chrono::nanoseconds::zero()) {
+			SDL_DelayPrecise(std::chrono::duration_cast<std::chrono::nanoseconds>(sleep_time).count());
+		}
+
 		// Get the current time and compute the elapsed time since the last tick.
 		auto now = std::chrono::steady_clock::now();
 		FrameTime ts = FrameTime::delta(m_lasttick, now);
