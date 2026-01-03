@@ -8,8 +8,10 @@
 #include "logger.hpp"
 #include "sdl_event.hpp"
 #include "sdl_settings.hpp"
+#include "sdl_window.hpp"
 #include "settings.hpp"
 #include "version.hpp"
+#include "video_settings.hpp"
 
 #include <imgui.h>
 #include <imgui_impl_sdl3.h>
@@ -66,6 +68,7 @@ bool is_keyboard_priority_event(const SDL_Event &event)
 bool is_app_input_priority_event(const SDL_Event &event) {
 	return is_keyboard_priority_event(event);
 }
+
 } // namespace
 
 struct App::D
@@ -141,12 +144,19 @@ AppRunResult App::init(int argc, char *argv[])
 	// Limit clock to target FPS
 	recalculate_fps_clock();
 
-	// Create a window
+	// Create the window
+	// Correct the window size first if the saved settings are invalid.
+	if (d->settings.windowed_width <= 0) {
+		d->settings.windowed_width = DEFAULT_WINDOW_WIDTH;
+	}
+	if (d->settings.windowed_height <= 0) {
+		d->settings.windowed_height = DEFAULT_WINDOW_HEIGHT;
+	}
 	const std::string title = app_full_signature();
 	d->window = SDL_CreateWindow(
 		title.c_str(),
-		DEFAULT_WINDOW_WIDTH,
-		DEFAULT_WINDOW_HEIGHT,
+		d->settings.windowed_width,
+		d->settings.windowed_height,
 		SDL_WINDOW_RESIZABLE
 	);
 	if (d->window == nullptr) {
@@ -160,6 +170,11 @@ AppRunResult App::init(int argc, char *argv[])
 		std::cerr << "SDL_CreateRenderer Error: " << SDL_GetError() << std::endl;
 		return AppRunResult::FAILURE;
 	}
+
+	// Load video settings into the window.
+	// Must happen after the renderer is created, otherwise the 'y' position
+	// of the window in WINDOWED mode is not restored properly for some reason.
+	load_window_video_settings(d->settings, d->window);
 
 	// Create GUI
 	d->gui = std::make_unique<gui::Gui>(*this, *d->window, *d->renderer);
@@ -228,12 +243,16 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 				return AppRunResult::SUCCESS;
 			} else if (is_alt_enter(event.key)) {
 				// Toggle fullscreen
-				Uint32 flags = SDL_GetWindowFlags(d->window);
-				if (flags & SDL_WINDOW_FULLSCREEN) {
-					SDL_SetWindowFullscreen(d->window, 0);
+				const auto flags = SDL_GetWindowFlags(d->window);
+				if (!(flags & SDL_WINDOW_FULLSCREEN)) {
+					SDL_SetWindowFullscreen(d->window, true);
 				} else {
-					SDL_SetWindowFullscreen(d->window, SDL_WINDOW_FULLSCREEN);
+					SDL_SetWindowFullscreen(d->window, false);
+					SDL_SetWindowBordered(d->window, true);
 				}
+				settings().display_mode = flags & SDL_WINDOW_FULLSCREEN
+					? static_cast<int>(DisplayMode::WINDOWED)
+					: static_cast<int>(DisplayMode::BORDERLESS_FULLSCREEN);
 				continue;
 			} else if (is_keyboard_gizmo_create_key(event.key)) {
 				// Create a gizmo for the keyboard
@@ -241,9 +260,23 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 				spawn_controller_gizmo(controller);
 			}
 			break;
+		case SDL_EVENT_WINDOW_MOVED:
+			if (sdl::is_window_normal(d->window)) {
+				settings().windowed_x = event.window.data1;
+				settings().windowed_y = event.window.data2;
+			}
+			break;
 		case SDL_EVENT_WINDOW_RESIZED:
 			// Update arena bounds
 			d->arena->set_bounds({ 0, 0, event.window.data1, event.window.data2 });
+			if (sdl::is_window_normal(d->window)) {
+				settings().windowed_width = event.window.data1;
+				settings().windowed_height = event.window.data2;
+			}
+			break;
+		case SDL_EVENT_WINDOW_MAXIMIZED:
+		case SDL_EVENT_WINDOW_RESTORED:
+			settings().windowed_maximized = sdl::is_window_maximized(d->window);
 			break;
 		case SDL_EVENT_JOYSTICK_ADDED:
 		case SDL_EVENT_JOYSTICK_REMOVED:
@@ -471,6 +504,10 @@ Settings &App::settings() {
 
 const OpenedJoysticksMap &App::joysticks() const {
 	return d->joysticks;
+}
+
+SDL_Window *App::window() const {
+	return d->window;
 }
 
 } // namespace robikzinputtest

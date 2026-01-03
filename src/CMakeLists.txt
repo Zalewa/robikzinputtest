@@ -65,6 +65,7 @@ add_executable(
 	gui_overlay_help.cpp
 	gui_overlay_joystick.cpp
 	gui_window_program_log.cpp
+	gui_window_resolution_popup.cpp
 	gui_window_settings.cpp
 	main.cpp
 	properties_file.cpp
@@ -73,6 +74,8 @@ add_executable(
 	settings.cpp
 	variant.cpp
 	version.cpp
+	video.cpp
+	video_settings.cpp
 )
 
 target_include_directories(

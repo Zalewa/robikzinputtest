@@ -1,6 +1,7 @@
 #pragma once
 
 #include "color.hpp"
+#include "video.hpp"
 
 #include <utility>
 #include <vector>
@@ -35,6 +36,20 @@ struct Settings {
 	bool background_animate = true;
 	Color background_flash_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	bool background_flash_on_gizmo_action = false;
+
+	int display_mode = static_cast<int>(DisplayMode::WINDOWED);
+	int windowed_x = SDL_WINDOWPOS_CENTERED;
+	int windowed_y = SDL_WINDOWPOS_CENTERED;
+	int windowed_width = 800;
+	int windowed_height = 600;
+	bool windowed_maximized = false;
+	int fullscreen_width = 0;
+	int fullscreen_height = 0;
+	int fullscreen_refresh_rate_numerator = 0;
+	int fullscreen_refresh_rate_denominator = 0;
+	uint32_t fullscreen_pixel_format = SDL_PIXELFORMAT_UNKNOWN;
+	float fullscreen_pixel_density = 0.0f;
+	std::string fullscreen_display_name;
 
 	void import_properties(const std::vector<Property> &properties);
 	std::vector<Property> export_properties() const;

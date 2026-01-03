@@ -19,6 +19,7 @@ public:
 	Handler<LogRecord> on_logrecord;
 
 	std::ostream &info() { return m_stream; }
+	std::ostream &error() { return m_stream; }
 
 private:
 	CallbackOstream m_stream;

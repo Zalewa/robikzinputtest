@@ -13,6 +13,7 @@ namespace robikzinputtest {
 class Arena;
 class Logger;
 struct Settings;
+struct VideoModeSettings;
 
 using JoystickUPtr = std::unique_ptr<SDL_Joystick, std::function<void(SDL_Joystick *)>>;
 using OpenedJoysticksMap = std::map<SDL_JoystickID, JoystickUPtr>;
@@ -48,6 +49,7 @@ public:
 	Logger &logger();
 	Settings &settings();
 	const OpenedJoysticksMap &joysticks() const;
+	SDL_Window *window() const;
 
 private:
 	struct D;

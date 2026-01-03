@@ -21,6 +21,10 @@ int32_t Variant::as_int32() const {
 	return std::strtol(this->m_value.c_str(), nullptr, 10);
 }
 
+uint32_t Variant::as_uint32() const {
+	return std::strtoul(this->m_value.c_str(), nullptr, 10);
+}
+
 int64_t Variant::as_int64() const {
 	return std::strtoll(this->m_value.c_str(), nullptr, 10);
 }

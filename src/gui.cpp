@@ -97,6 +97,7 @@ struct Gui::D {
 	Log log;
 
 	std::unique_ptr<WindowProgramLog> window_program_log;
+	std::unique_ptr<WindowSettings> window_settings;
 
 	bool imgui_init_context = false;
 	bool imgui_init_platform = false;
@@ -159,6 +160,7 @@ bool Gui::init() {
 	}
 	d->show_settings_window = d->app.settings().show_settings_at_start;
 
+	d->window_settings = std::make_unique<WindowSettings>();
 	d->window_program_log = std::make_unique<WindowProgramLog>(d->log);
 
 	return true;
@@ -167,6 +169,7 @@ bool Gui::init() {
 void Gui::close() {
 	d->app.logger().on_logrecord.remove(d->log_handler_id);
 	d->window_program_log.reset();
+	d->window_settings.reset();
 	if (d->imgui_init_renderer) {
 		ImGui_ImplSDLRenderer3_Shutdown();
 		d->imgui_init_renderer = false;
@@ -258,7 +261,7 @@ void Gui::iterate(
 		d->window_program_log->draw(guictx);
 	}
 	if (d->show_settings_window) {
-		window_settings(guictx, &d->show_settings_window);
+		d->window_settings->draw(guictx, &d->show_settings_window);
 	}
 
 	if (d->show_imgui_demo)

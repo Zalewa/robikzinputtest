@@ -56,12 +56,20 @@ static std::unique_ptr<PropRef<int>> intprop(const std::string &name, int &ref) 
 	return std::make_unique<PropRef<int>>(name, ref);
 }
 
+static std::unique_ptr<PropRef<uint32_t>> uint32prop(const std::string &name, uint32_t &ref) {
+	return std::make_unique<PropRef<uint32_t>>(name, ref);
+}
+
 static std::unique_ptr<PropRef<float>> floatprop(const std::string &name, float &ref) {
 	return std::make_unique<PropRef<float>>(name, ref);
 }
 
 static std::unique_ptr<PropRef<Color>> colorprop(const std::string &name, Color &ref) {
 	return std::make_unique<PropRef<Color>>(name, ref);
+}
+
+static std::unique_ptr<PropRef<std::string>> strprop(const std::string &name, std::string &ref) {
+	return std::make_unique<PropRef<std::string>>(name, ref);
 }
 
 std::vector<std::unique_ptr<PropImportExport>> create_settings_prop_map(Settings &settings) {
@@ -81,6 +89,22 @@ std::vector<std::unique_ptr<PropImportExport>> create_settings_prop_map(Settings
 	props.push_back(boolprop("background_animate", settings.background_animate));
 	props.push_back(colorprop("background_flash_color", settings.background_flash_color));
 	props.push_back(boolprop("background_flash_on_gizmo_action", settings.background_flash_on_gizmo_action));
+
+	// Video settings
+	props.push_back(intprop("display_mode", settings.display_mode));
+	props.push_back(intprop("windowed_x", settings.windowed_x));
+	props.push_back(intprop("windowed_y", settings.windowed_y));
+	props.push_back(intprop("windowed_width", settings.windowed_width));
+	props.push_back(intprop("windowed_height", settings.windowed_height));
+	props.push_back(boolprop("windowed_maximized", settings.windowed_maximized));
+	props.push_back(intprop("fullscreen_width", settings.fullscreen_width));
+	props.push_back(intprop("fullscreen_height", settings.fullscreen_height));
+	props.push_back(intprop("fullscreen_refresh_rate_numerator", settings.fullscreen_refresh_rate_numerator));
+	props.push_back(intprop("fullscreen_refresh_rate_denominator", settings.fullscreen_refresh_rate_denominator));
+	props.push_back(uint32prop("fullscreen_pixel_format", settings.fullscreen_pixel_format));
+	props.push_back(floatprop("fullscreen_pixel_density", settings.fullscreen_pixel_density));
+	props.push_back(strprop("fullscreen_display_name", settings.fullscreen_display_name));
+
 	return props;
 }
 
