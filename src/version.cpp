@@ -10,7 +10,7 @@ const std::string app_author()
 
 const std::string app_copyright()
 {
-	return "Copyright (c) 2025 Robert \"Robikz\" Zalewski";
+	return "Copyright (c) 2025-2026 Robert \"Robikz\" Zalewski";
 }
 
 const std::string app_full_signature()
