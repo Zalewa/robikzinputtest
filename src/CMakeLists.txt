@@ -56,6 +56,7 @@ add_executable(
 	color.cpp
 	controller_handler.cpp
 	controller_system.cpp
+	imgui_style.cpp
 	logger.cpp
 	gizmo.cpp
 	gizmo_render.cpp

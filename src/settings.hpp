@@ -36,6 +36,7 @@ struct Settings {
 	bool background_animate = true;
 	Color background_flash_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	bool background_flash_on_gizmo_action = false;
+	float program_log_opacity = 1.0f;
 
 	int display_mode = static_cast<int>(DisplayMode::WINDOWED);
 	int windowed_x = SDL_WINDOWPOS_CENTERED;

@@ -89,6 +89,7 @@ std::vector<std::unique_ptr<PropImportExport>> create_settings_prop_map(Settings
 	props.push_back(boolprop("background_animate", settings.background_animate));
 	props.push_back(colorprop("background_flash_color", settings.background_flash_color));
 	props.push_back(boolprop("background_flash_on_gizmo_action", settings.background_flash_on_gizmo_action));
+	props.push_back(floatprop("program_log_opacity", settings.program_log_opacity));
 
 	// Video settings
 	props.push_back(intprop("display_mode", settings.display_mode));

@@ -1,6 +1,7 @@
 #include "gui_logbox.hpp"
 
 #include "gui_log.hpp"
+#include "imgui_style.hpp"
 
 #include <imgui.h>
 
@@ -10,15 +11,25 @@ LogBox::LogBox() {
 	m_auto_scroll = true;
 }
 
-void LogBox::draw(Log &log, const char *title, bool *p_open) {
-	if (!ImGui::Begin(title, p_open)) {
-		ImGui::End();
-		return;
+void LogBox::draw(Log &log, const char *title, bool *p_open, float *opacity) {
+	if (opacity != nullptr) {
+		imgui::push_window_opacity(*opacity);
 	}
+	if (ImGui::Begin(title, p_open, ImGuiWindowFlags_NoMove)) {
+		this->draw_body(log, opacity);
+	}
+	ImGui::End();
+	if (opacity != nullptr) {
+		imgui::pop_window_opacity();
+	}
+}
 
+void LogBox::draw_body(Log &log, float *opacity) {
 	// Options menu
 	if (ImGui::BeginPopup("Options")) {
 		ImGui::Checkbox("Auto-scroll", &m_auto_scroll);
+		if (opacity != nullptr)
+			ImGui::SliderFloat("Opacity", opacity, 0.0f, 1.0f);
 		ImGui::EndPopup();
 	}
 
@@ -79,7 +90,6 @@ void LogBox::draw(Log &log, const char *title, bool *p_open) {
 			ImGui::SetScrollHereY(1.0f);
 	}
 	ImGui::EndChild();
-	ImGui::End();
 }
 
 } // namespace robikzinputtest::gui
