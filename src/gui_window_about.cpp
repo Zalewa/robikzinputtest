@@ -3,6 +3,7 @@
 #include "gui_context.hpp"
 #include "version.hpp"
 
+#include <SDL3/SDL.h>
 #include <imgui.h>
 
 #include <string>
@@ -24,6 +25,27 @@ void WindowAbout::draw(const GuiContext &guictx, bool *p_open) {
 			"%s is licensed under %s.",
 			app_name().c_str(),
 			app_license().c_str()
+		);
+		ImGui::SeparatorText("Dear ImGUI");
+		ImGui::Text(
+			"This software uses Dear ImGUI version %s.",
+			ImGui::GetVersion()
+		);
+		ImGui::TextLinkOpenURL(
+			"Dear ImGUI Homepage",
+			"https://github.com/ocornut/imgui"
+		);
+		ImGui::SeparatorText("Simple DirectMedia Layer");
+		const auto sdl_version = SDL_GetVersion();
+		ImGui::Text(
+			"This software uses Simple DirectMedia Layer version %d.%d.%d.",
+			SDL_VERSIONNUM_MAJOR(sdl_version),
+			SDL_VERSIONNUM_MINOR(sdl_version),
+			SDL_VERSIONNUM_MICRO(sdl_version)
+		);
+		ImGui::TextLinkOpenURL(
+			"Simple DirectMedia Layer Homepage",
+			"https://www.libsdl.org/"
 		);
 	}
 	ImGui::End();
