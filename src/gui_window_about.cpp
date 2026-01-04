@@ -19,6 +19,11 @@ void WindowAbout::draw(const GuiContext &guictx, bool *p_open) {
 		if (ImGui::Button("Copy")) {
 			ImGui::SetClipboardText(app_full_signature().c_str());
 		}
+		ImGui::SameLine();
+		ImGui::TextLinkOpenURL(
+			"Homepage",
+			"https://github.com/Zalewa/robikzinputtest"
+		);
 		ImGui::Separator();
 		ImGui::Text("%s", app_copyright().c_str());
 		ImGui::Text(
