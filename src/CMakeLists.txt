@@ -65,6 +65,7 @@ add_executable(
 	gui_overlay_fps.cpp
 	gui_overlay_help.cpp
 	gui_overlay_joystick.cpp
+	gui_window_about.cpp
 	gui_window_program_log.cpp
 	gui_window_resolution_popup.cpp
 	gui_window_settings.cpp

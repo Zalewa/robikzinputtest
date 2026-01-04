@@ -3,6 +3,7 @@
 #include "app.hpp"
 #include "arena.hpp"
 #include "gui_context.hpp"
+#include "gui_window_about.hpp"
 #include "gui_window_resolution_popup.hpp"
 #include "logger.hpp"
 #include "settings.hpp"
@@ -31,15 +32,19 @@ static std::string get_resolution_label(const DisplaySettings &display_settings)
 }
 
 struct WindowSettings::D {
+	std::unique_ptr<WindowAbout> window_about;
 	std::unique_ptr<WindowResolutionPopup> window_resolution_popup;
 
 	VideoModeSettings video_mode_settings {};
 	VideoModeSettings original_video_mode_settings {};
 	bool resolution_just_changed = false;
 	bool resolution_needs_confirmation = false;
+	bool show_about = false;
 
 	D()
-		: window_resolution_popup(std::make_unique<WindowResolutionPopup>()) {
+		:
+		window_about(std::make_unique<WindowAbout>()),
+		window_resolution_popup(std::make_unique<WindowResolutionPopup>()) {
 	}
 
 	void reset_display_settings_to_factual(SDL_Window *window) {
@@ -128,10 +133,17 @@ void WindowSettings::draw(const GuiContext &guictx, bool *p_open) {
 
 void WindowSettings::draw_app_info(const GuiContext &guictx) {
 	// Application info
-	ImGui::Text("%s", app_name().c_str());
-	ImGui::Text("v%s", app_version().c_str());
 	if (ImGui::Button("Quit")) {
 		guictx.app.quit();
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("About")) {
+		d->show_about = true;
+	}
+	// About
+	if (d->show_about) {
+		const std::string title = "About"s + app_name();
+		d->window_about->draw(guictx, &d->show_about);
 	}
 }
 

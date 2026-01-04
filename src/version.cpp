@@ -33,6 +33,11 @@ const std::string app_identifier()
 	return app_identifier_organization() + "." + app_identifier_appname();
 }
 
+const std::string app_license()
+{
+	return "MIT License";
+}
+
 const std::string app_name()
 {
 	return "Robikz's Input Test";

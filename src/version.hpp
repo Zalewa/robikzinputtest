@@ -31,6 +31,10 @@ const std::string app_identifier_appname();
  */
 const std::string app_identifier();
 /**
+ * What the app is licensed under.
+ */
+const std::string app_license();
+/**
  * Name of the application.
  */
 const std::string app_name();
