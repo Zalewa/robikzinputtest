@@ -2,8 +2,11 @@
 
 #include "app.hpp"
 #include "controller.hpp"
+#include "sdl_math.hpp"
 #include "settings.hpp"
+
 #include <SDL3/SDL.h>
+
 #include <cstdlib>
 
 namespace robikzinputtest {
@@ -39,6 +42,84 @@ static bool is_joystick_throttle_axis(int32_t axis) {
 		|| axis == JOYSTICK_GAMEPAD_RIGHT_THROTTLE_AXIS;
 }
 
+/**
+ * Get movement direction as indicated by joystick's axes (thumbsticks).
+ *
+ * Deadzone is taken into account. An axis with an absolute value below the
+ * deadzone is ignored. Axis value gets rescaled linearly in accordance to
+ * the deadzone.
+ *
+ * The movement direction is not normalized (it may exceed a unit vector).
+ */
+static SDL_FPoint get_joystick_axis_direction(SDL_Joystick *joystick, int32_t deadzone) {
+	SDL_FPoint total_direction = { 0, 0 };
+	SDL_LockJoysticks();
+	const int32_t n_axes = SDL_GetNumJoystickAxes(joystick);
+	for (int32_t n_axis = 0; n_axis < n_axes; ++n_axis) {
+		const int32_t axis = SDL_GetJoystickAxis(joystick, n_axis);
+		if (axis != 0 && std::abs(axis) >= deadzone) {
+			float axis_magnitude = 0.0f;
+			if (axis > 0 && deadzone < JOYSTICK_AXIS_MAX32) {
+				axis_magnitude =
+					static_cast<float>(axis - deadzone)
+					/ static_cast<float>(JOYSTICK_AXIS_MAX32 - deadzone);
+			} else if (axis < 0 && -deadzone > JOYSTICK_AXIS_MIN32) {
+				axis_magnitude =
+					static_cast<float>(axis + deadzone)
+					/ static_cast<float>(JOYSTICK_AXIS_MIN32 + deadzone);
+				axis_magnitude *= -1;
+			}
+			if (is_joystick_horizontal_axis(n_axis)) {
+				total_direction.x += axis_magnitude;
+			}
+			if (is_joystick_vertical_axis(n_axis)) {
+				total_direction.y += axis_magnitude;
+			}
+		}
+	}
+	SDL_UnlockJoysticks();
+	return total_direction;
+}
+
+/**
+ * Get movement direction as indicated by joystick's d-pads.
+ *
+ * The movement direction is not normalized (it may exceed a unit vector).
+ */
+static SDL_FPoint get_joystick_dpad_direction(SDL_Joystick *joystick) {
+	SDL_FPoint total_direction = { 0, 0 };
+	SDL_LockJoysticks();
+	// The joystick's "hat" (or "d-pad") is also recognized as an axis of movement.
+	const int32_t n_hats = SDL_GetNumJoystickHats(joystick);
+	for (int32_t n_hat = 0; n_hat < n_hats; ++n_hat) {
+		uint8_t hat = SDL_GetJoystickHat(joystick, n_hat);
+		SDL_FPoint hat_direction = { 0, 0 };
+		total_direction.x += (hat & SDL_HAT_LEFT) ? -1.0f : 0.0f;
+		total_direction.x += (hat & SDL_HAT_RIGHT) ? +1.0f : 0.0f;
+		total_direction.y += (hat & SDL_HAT_UP) ? -1.0f : 0.0f;
+		total_direction.y += (hat & SDL_HAT_DOWN) ? +1.0f : 0.0f;
+	}
+	SDL_UnlockJoysticks();
+	return total_direction;
+}
+
+/**
+ * Sum up all joystick movements buttons into a movement vector.
+ */
+static SDL_FPoint get_joystick_complete_normalized_movement_direction(SDL_Joystick *joystick, int32_t deadzone) {
+	SDL_FPoint total_direction = { 0, 0 };
+	sdl::addi_fpoint(total_direction, get_joystick_axis_direction(joystick, deadzone));
+	sdl::addi_fpoint(total_direction, get_joystick_dpad_direction(joystick));
+	if (sdl::magvec_fpoint(total_direction) > 1.0f) {
+		// If overall magnitude is higher than a unit, clamp it.
+		return sdl::normveci_fpoint(total_direction);
+	} else {
+		// Magnitudes lower than a unit are allowed.
+		return total_direction;
+	}
+}
+
+#if 0
 static int32_t sum_joystick_thumbsticks_for_axis(SDL_Joystick *joystick, int32_t axis, int32_t deadzone) {
 	SDL_LockJoysticks();
 	const int32_t n_axes = SDL_GetNumJoystickAxes(joystick);
@@ -71,6 +152,7 @@ static int32_t sum_joystick_thumbsticks_for_axis(SDL_Joystick *joystick, int32_t
 	SDL_UnlockJoysticks();
 	return summed_axis_value;
 }
+#endif
 
 bool JoystickControllerHandler::handle_event(
 	App &app,
@@ -89,49 +171,25 @@ bool JoystickControllerHandler::handle_event(
 			} else if (state.button_primary == ButtonState::PRESSED) {
 				state.button_primary = ButtonState::RELEASED;
 			}
+		} else {
+			SDL_Joystick *joystick = SDL_GetJoystickFromID(event.jaxis.which);
+			if (joystick != nullptr) {
+				state.direction_vec2 = get_joystick_complete_normalized_movement_direction(
+					joystick,
+					app.settings().joystick_deadzone
+				);
+			}
 		}
-		const int32_t stick_deadzone = app.settings().joystick_deadzone;
-		// Increase the space to 32-bit for calculations.
-		int32_t axis_value =  event.jaxis.value;
-		// Since multiple thumbsticks can control movement, it's necessary
-		// to sum their values to see if they cancel each other out.
-		auto joystick_it = app.joysticks().find(event.jaxis.which);
-		if (joystick_it != app.joysticks().end()) {
-			axis_value = sum_joystick_thumbsticks_for_axis(
-				joystick_it->second.get(),
-				event.jaxis.axis,
-				stick_deadzone
+	} else if (event.type == SDL_EVENT_JOYSTICK_HAT_MOTION) {
+		if (event.jhat.which != controller.id.index)
+			return false;
+
+		SDL_Joystick *joystick = SDL_GetJoystickFromID(event.jhat.which);
+		if (joystick != nullptr) {
+			state.direction_vec2 = get_joystick_complete_normalized_movement_direction(
+				joystick,
+				app.settings().joystick_deadzone
 			);
-		}
-
-		int32_t axis_value_in_deadzone = 0;
-		int32_t axis_max_in_deadzone = 0;
-		if (axis_value >= 0) {
-			axis_value_in_deadzone = axis_value - stick_deadzone;
-			axis_max_in_deadzone = JOYSTICK_AXIS_MAX32 - stick_deadzone;
-		} else {
-			axis_value_in_deadzone = (axis_value * -1) - stick_deadzone;
-			axis_max_in_deadzone = (JOYSTICK_AXIS_MIN32 * -1) - stick_deadzone;
-		}
-
-		if (axis_value_in_deadzone > 0 && axis_max_in_deadzone > 0) {
-			double normalized = 0.0;
-			normalized = static_cast<double>(axis_value_in_deadzone) / axis_max_in_deadzone;
-			if (axis_value < 0) {
-				normalized *= -1.0f;
-			}
-
-			if (is_joystick_horizontal_axis(axis)) {
-				state.direction_vec2.x = normalized;
-			} else if (is_joystick_vertical_axis(axis)) {
-				state.direction_vec2.y = normalized;
-			}
-		} else {
-			if (is_joystick_horizontal_axis(axis)) {
-				state.direction_vec2.x = 0.0;
-			} else if (is_joystick_vertical_axis(axis)) {
-				state.direction_vec2.y = 0.0;
-			}
 		}
 	} else if (
 		event.type == SDL_EVENT_JOYSTICK_BUTTON_DOWN
