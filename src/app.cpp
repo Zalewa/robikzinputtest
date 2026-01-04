@@ -343,7 +343,7 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 			}
 			break;
 		case SDL_EVENT_JOYSTICK_HAT_MOTION:
-			if (d->settings.log_joystick_button_events) {
+			if (d->settings.log_joystick_hat_events) {
 				d->logger.info()
 					<< "JOYSTICK_HAT_MOTION "
 					<< "timestamp=" << event.jhat.timestamp << ", "

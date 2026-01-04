@@ -36,6 +36,11 @@ void overlay_joystick(const GuiContext &guictx) {
 			const int axis_value = SDL_GetJoystickAxis(joystick, axis);
 			ImGui::Text("Axis %d: %d", axis, axis_value);
 		}
+		const int n_hats = SDL_GetNumJoystickHats(joystick);
+		for (int hat = 0; hat < n_hats; ++hat) {
+			const int hat_value = SDL_GetJoystickHat(joystick, hat);
+			ImGui::Text("Hat %d: %d", hat, hat_value);
+		}
 		const int n_buttons = SDL_GetNumJoystickButtons(joystick);
 		std::ostringstream ss_buttons;
 		for (int button = 0; button < n_buttons; ++button) {

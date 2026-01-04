@@ -39,6 +39,10 @@ void WindowProgramLog::draw(const GuiContext &guictx) {
 			"Log joystick button events",
 			&guictx.app.settings().log_joystick_button_events
 		);
+		ImGui::Checkbox(
+			"Log joystick hat events",
+			&guictx.app.settings().log_joystick_hat_events
+		);
 	};
 
 	m_logbox.draw(

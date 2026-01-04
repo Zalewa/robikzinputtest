@@ -58,6 +58,7 @@ struct Settings {
 	// Log settings
 	bool log_joystick_axis_events = false;
 	bool log_joystick_button_events = false;
+	bool log_joystick_hat_events = false;
 
 	void import_properties(const std::vector<Property> &properties);
 	std::vector<Property> export_properties() const;
