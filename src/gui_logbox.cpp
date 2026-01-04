@@ -7,6 +7,20 @@
 
 namespace robikzinputtest::gui {
 
+static void append_record(
+	std::stringstream &ss,
+	const char *record_begin,
+	const char *record_end
+) {
+	// Make sure that all records end with a newline in the clipboard,
+	// but also make sure that no extraneous newlines are added,
+	// i.e. there should not be empty lines between records.
+	if (record_end > record_begin && *(record_end - 1) == '\n')
+		record_end--;
+	std::string record(record_begin, record_end);
+	ss << record << std::endl;
+}
+
 LogBox::LogBox() {
 	m_auto_scroll = true;
 }
@@ -54,8 +68,9 @@ void LogBox::draw_body(Log &log, float *opacity) {
 	) {
 		if (clear)
 			log.clear();
-		if (copy)
-			ImGui::LogToClipboard();
+		if (copy) {
+			m_clipboard.clear();
+		}
 
 		const ImGuiTextBuffer &buffer = log.buffer();
 		const std::vector<int64_t> &record_offsets = log.record_offsets();
@@ -69,8 +84,11 @@ void LogBox::draw_body(Log &log, float *opacity) {
 				const char* record_end = (nrecord + 1 < record_offsets.size())
 					? (buf + record_offsets[nrecord + 1] - 1)
 					: buf_end;
-				if (m_filter.PassFilter(record_start, record_end))
+				if (m_filter.PassFilter(record_start, record_end)) {
+					if (copy && record_start != buf_end)
+						append_record(m_clipboard, record_start, record_end);
 					ImGui::TextUnformatted(record_start, record_end);
+				}
 			}
 		} else {
 			ImGuiListClipper clipper;
@@ -79,6 +97,8 @@ void LogBox::draw_body(Log &log, float *opacity) {
 				for (int nrecord = clipper.DisplayStart; nrecord < clipper.DisplayEnd; nrecord++) {
 					const char* record_start = buf + record_offsets[nrecord];
 					const char* record_end = (nrecord + 1 < record_offsets.size()) ? (buf + record_offsets[nrecord + 1] - 1) : buf_end;
+					if (copy && record_start != buf_end)
+						append_record(m_clipboard, record_start, record_end);
 					ImGui::TextUnformatted(record_start, record_end);
 				}
 			}
@@ -86,6 +106,14 @@ void LogBox::draw_body(Log &log, float *opacity) {
 		}
 		ImGui::PopStyleVar();
 
+		if (copy) {
+			// The "ImGui::LogToClipboard()", taken from ImGUI's own demo, was
+			// here before, but it would append extraneous newlines after each
+			// record even if those were stripped from TextUnformatted. I was
+			// unable to repair this, so "copy" runs via this now:
+			ImGui::SetClipboardText(m_clipboard.str().c_str());
+			m_clipboard.clear();
+		}
 		if (m_auto_scroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
 			ImGui::SetScrollHereY(1.0f);
 	}

@@ -2,6 +2,8 @@
 
 #include <imgui.h>
 
+#include <sstream>
+
 namespace robikzinputtest::gui {
 
 class Log;
@@ -15,6 +17,7 @@ public:
 private:
 	ImGuiTextFilter m_filter;
 	bool m_auto_scroll;
+	std::stringstream m_clipboard;
 
 	void draw_body(Log &log, float *opacity);
 };
