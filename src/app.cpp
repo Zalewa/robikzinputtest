@@ -11,6 +11,7 @@
 #include "sdl_window.hpp"
 #include "settings.hpp"
 #include "version.hpp"
+#include "video.hpp"
 #include "video_settings.hpp"
 
 #include <imgui.h>
@@ -245,14 +246,14 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 				// Toggle fullscreen
 				const auto flags = SDL_GetWindowFlags(d->window);
 				if (!(flags & SDL_WINDOW_FULLSCREEN)) {
+					d->logger.info() << "Switching to fullscreen" << std::endl;
 					SDL_SetWindowFullscreen(d->window, true);
 				} else {
+					d->logger.info() << "Switching to windowed" << std::endl;
 					SDL_SetWindowFullscreen(d->window, false);
 					SDL_SetWindowBordered(d->window, true);
 				}
-				settings().display_mode = flags & SDL_WINDOW_FULLSCREEN
-					? static_cast<int>(DisplayMode::WINDOWED)
-					: static_cast<int>(DisplayMode::BORDERLESS_FULLSCREEN);
+				settings().display_mode = static_cast<int>(get_window_display_mode(d->window));
 				continue;
 			} else if (is_keyboard_gizmo_create_key(event.key)) {
 				// Create a gizmo for the keyboard
