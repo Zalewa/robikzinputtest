@@ -8,7 +8,7 @@ shape, and devices can be plugged in or removed at any time.
 Use this app to measure your input device's reaction time against your
 display and identify any input lag.
 
-// **TODO:** short demo vid goes here
+[](https://github.com/user-attachments/assets/6d6ca035-67c1-4905-bcba-1dec78b2d14c)
 
 ## Compilation
 
