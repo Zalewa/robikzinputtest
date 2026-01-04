@@ -177,6 +177,12 @@ AppRunResult App::init(int argc, char *argv[])
 	// of the window in WINDOWED mode is not restored properly for some reason.
 	load_window_video_settings(d->settings, d->window);
 
+	// Load VSync setting
+	if (!SDL_SetRenderVSync(d->renderer, d->settings.vsync)) {
+		std::cerr << "Failed to initialize VSync: " << SDL_GetError() << std::endl;
+		// non-fatal error; continue
+	}
+
 	// Create GUI
 	d->gui = std::make_unique<gui::Gui>(*this, *d->window, *d->renderer);
 	if (!d->gui->init()) {
@@ -509,6 +515,10 @@ Settings &App::settings() {
 
 const OpenedJoysticksMap &App::joysticks() const {
 	return d->joysticks;
+}
+
+SDL_Renderer *App::renderer() const {
+	return d->renderer;
 }
 
 SDL_Window *App::window() const {

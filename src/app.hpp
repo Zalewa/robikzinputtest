@@ -49,6 +49,7 @@ public:
 	Logger &logger();
 	Settings &settings();
 	const OpenedJoysticksMap &joysticks() const;
+	SDL_Renderer *renderer() const;
 	SDL_Window *window() const;
 
 private:

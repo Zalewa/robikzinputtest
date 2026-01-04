@@ -105,4 +105,6 @@ DisplayMode get_window_display_mode(SDL_Window *window);
 VideoModeSettings get_window_video_mode_settings(SDL_Window *window);
 bool set_window_video_mode_settings(SDL_Window *window, const VideoModeSettings &video_mode_settings);
 
+std::string get_vsync_state_label(int vsync);
+
 } // namespace robikzinputtest

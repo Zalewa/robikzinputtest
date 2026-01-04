@@ -110,6 +110,7 @@ void WindowSettings::draw(const GuiContext &guictx, bool *p_open) {
 	draw_app_info(guictx);
 	ImGui::Separator();
 	draw_display_settings(guictx);
+	draw_vsync_settings(guictx);
 	ImGui::Separator();
 	draw_fps_settings(guictx);
 	ImGui::Separator();
@@ -270,6 +271,91 @@ void WindowSettings::draw_display_settings(const GuiContext &guictx) {
 			std::endl;
 	}
 	ImGui::SetItemTooltip("Reload display settings from the actual window settings");
+}
+
+void WindowSettings::draw_vsync_settings(const GuiContext &guictx) {
+	static const std::array<int, 3> defined_vsync_modes = {
+		SDL_RENDERER_VSYNC_DISABLED,
+		1,
+		SDL_RENDERER_VSYNC_ADAPTIVE,
+	};
+	static const int default_custom_vsync = 2;
+	static const std::string vsync_custom_label = "Custom ...";
+
+	int vsync;
+	bool vsync_ok = SDL_GetRenderVSync(guictx.app.renderer(), &vsync);
+	std::string vsync_get_error;
+	bool vsync_custom_value = vsync_ok && vsync > 1;
+	if (!vsync_ok) {
+		vsync_get_error = SDL_GetError();
+	}
+	auto set_vsync = [&guictx](int new_vsync) {
+		if (SDL_SetRenderVSync(guictx.app.renderer(), new_vsync)) {
+			guictx.app.logger().info()
+				<< "Vsync changed to "
+				<< get_vsync_state_label(new_vsync)
+				<< std::endl;
+			guictx.app.settings().vsync = new_vsync;
+		} else {
+			guictx.app.logger().error()
+				<< "Failed to change vsync to "
+				<< get_vsync_state_label(new_vsync)
+				<< ": "
+				<< SDL_GetError()
+				<< std::endl;
+		}
+	};
+	std::string vsync_label;
+	if (vsync_custom_value) {
+		vsync_label = vsync_custom_label;
+	} else if (vsync_ok) {
+		vsync_label = get_vsync_state_label(vsync);
+	} else {
+		vsync_label = "UNKNOWN";
+	}
+	ImGui::SetNextItemWidth(100.0f);
+	if (ImGui::BeginCombo("VSync", vsync_label.c_str())) {
+		// Predefined VSync values
+		for (int predefined_value : defined_vsync_modes) {
+			if (
+				ImGui::Selectable(
+					get_vsync_state_label(predefined_value).c_str(),
+					vsync_ok && vsync == predefined_value
+				)
+			) {
+				set_vsync(predefined_value);
+			}
+		}
+		// Customizable VSync
+		if (
+			ImGui::Selectable(
+				vsync_custom_label.c_str(),
+				vsync_custom_value
+			)
+		) {
+			if (!vsync_custom_value)
+				set_vsync(default_custom_vsync);
+		}
+		ImGui::EndCombo();
+	}
+	if (vsync_custom_value) {
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(80.0f);
+		if (
+			ImGui::DragInt(
+				"##",
+				&vsync,
+				1.0f, 2, 10000, "1 out of %d",
+				ImGuiSliderFlags_AlwaysClamp
+			)
+		) {
+			set_vsync(vsync);
+		}
+	}
+	if (!vsync_ok) {
+		ImGui::SameLine();
+		ImGui::Text("%s", vsync_get_error.c_str());
+	}
 }
 
 void WindowSettings::draw_display_confirmation_popup(const GuiContext &guictx) {

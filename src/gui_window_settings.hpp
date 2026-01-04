@@ -23,6 +23,7 @@ private:
 	void draw_app_info(const GuiContext &guictx);
 	void draw_display_settings(const GuiContext &guictx);
 	void draw_display_confirmation_popup(const GuiContext &guictx);
+	void draw_vsync_settings(const GuiContext &guictx);
 	void draw_fps_settings(const GuiContext &guictx);
 	void draw_ui_settings(const GuiContext &guictx);
 	void draw_gizmo_settings(const GuiContext &guictx);

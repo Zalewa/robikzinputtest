@@ -52,6 +52,7 @@ struct Settings {
 	uint32_t fullscreen_pixel_format = SDL_PIXELFORMAT_UNKNOWN;
 	float fullscreen_pixel_density = 0.0f;
 	std::string fullscreen_display_name;
+	int vsync = SDL_RENDERER_VSYNC_DISABLED;
 
 	void import_properties(const std::vector<Property> &properties);
 	std::vector<Property> export_properties() const;

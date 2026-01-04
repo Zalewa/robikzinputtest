@@ -2,6 +2,8 @@
 
 #include <SDL3/SDL.h>
 
+#include <string>
+
 namespace robikzinputtest {
 
 /*
@@ -384,6 +386,25 @@ bool set_window_video_mode_settings(SDL_Window *window, const VideoModeSettings 
 		return false;
 	}
 	return true;
+}
+
+std::string get_vsync_state_label(int vsync) {
+	using namespace std::string_literals;
+
+	switch (vsync) {
+	case SDL_RENDERER_VSYNC_DISABLED:
+		return "DISABLED";
+	case SDL_RENDERER_VSYNC_ADAPTIVE:
+		return "ADAPTIVE";
+	case 1:
+		return "ENABLED";
+	default:
+		if (vsync > 0) {
+			return "Every 1 out of "s + std::to_string(vsync) + " frames"s;
+		} else {
+			return "UNKNOWN";
+		}
+	}
 }
 
 } // namespace robikzinputtest

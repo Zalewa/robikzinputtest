@@ -108,6 +108,7 @@ std::vector<std::unique_ptr<PropImportExport>> create_settings_prop_map(Settings
 	props.push_back(uint32prop("fullscreen_pixel_format", settings.fullscreen_pixel_format));
 	props.push_back(floatprop("fullscreen_pixel_density", settings.fullscreen_pixel_density));
 	props.push_back(strprop("fullscreen_display_name", settings.fullscreen_display_name));
+	props.push_back(intprop("vsync", settings.vsync));
 
 	return props;
 }
