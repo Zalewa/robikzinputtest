@@ -76,6 +76,50 @@ between input activation and visual response.
 
 For quick testing: if lag is noticeable during normal use, it's probably significant.
 
+## Packaging
+
+Packaging is for a public release.
+
+### Packaging for Linux -- AppImage
+
+**NOTE:** Packaging operation should be run on a sufficiently old Linux system
+so that compatibility with older libc versions is maintained.
+
+Building a clean release package:
+
+```bash
+mkdir -p ./build/appimage-release && cd ./build/appimage-release
+cmake -D CMAKE_BUILD_TYPE=Release ../..
+cmake --build . --target clean
+cmake --build . -j `nproc`
+rm -rf ./AppDir && cmake --build . --target appimage
+```
+
+An `.appimage` file should appear in the build directory.
+
+For extra cleaniness, the build directory can be recreated beforehand, though
+the removal of `./AppDir` prior to running the `appimage` target should be
+enough.
+
+## Packaging for Windows -- ZIP
+
+From command prompt (PowerShell should also be okay), starting
+at repository's root:
+
+```cmd
+mkdir build
+cd build
+mkdir zip-release
+cd zip-release
+cmake -G "MinGW Makefiles" -D CMAKE_BUILD_TYPE=Release ../..
+cmake --build . --target clean
+cmake --build . -j32
+cpack .
+```
+
+For subsequent packages, it should be sufficient to redo the steps starting
+with `cmake -G ...`.
+
 ## Platforms
 
 The app has been developed and tested on the following platforms:
@@ -87,3 +131,6 @@ The app has been developed and tested on the following platforms:
 ## License
 
 MIT License. See [LICENSE](LICENSE.txt).
+
+Somefiles may be under a different license, as denoted
+by [ATTRIBUTION](ATTRIBUTION.md) or file headers.

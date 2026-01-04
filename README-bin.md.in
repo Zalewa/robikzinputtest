@@ -1,0 +1,31 @@
+# Robikz's Input Test
+
+Version: @robikzinputtest_VERSION_FULL@
+
+This desktop application runs on SDL3 and lets you move 2D shapes across
+the screen using a keyboard or gamepad. Press specific keys or buttons
+to make the shapes flash. Each connected input device controls its own
+shape, and devices can be plugged in or removed at any time.
+
+Use this app to measure your input device's reaction time against your
+display and identify any input lag.
+
+Demo:
+[](https://github.com/user-attachments/assets/6d6ca035-67c1-4905-bcba-1dec78b2d14c)
+
+## Usage
+
+The application displays basic usage info upon launch on the help overlay.
+
+**Measuring Input Lag:**
+
+The app, by itself, is merely reacting to your input by moving or flashing
+shapes on screen. To measure actual response time, record your input
+device and screen simultaneously with a camera, then count frames
+between input activation and visual response.
+
+For quick testing: if lag is noticeable during normal use, it's probably significant.
+
+## License
+
+MIT License. See [LICENSE](LICENSE.txt).

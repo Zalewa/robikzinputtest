@@ -2,10 +2,14 @@
 
 ## Media
 
-- Game controller vector graphic
+- `media/gamepad-silhouette-freesvg.org.svg`
+    - Game controller vector graphic
     - Public Domain
     - <https://publicdomainvectors.org/en/free-clipart/Game-controller-silhouette-clip-art/86013.html>
       Accessed 2026-01-04
+- `media/gamepad-silhouette-whiteborder-256px.png`
+    - Derivative of `media/gamepad-silhouette-freesvg.org.svg`
+    - Public Domain
 
 ## Libraries
 
