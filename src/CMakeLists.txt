@@ -1,5 +1,5 @@
 # Project setup
-configure_file(version_defs.hpp.in version_defs.hpp)
+configure_file(version_defs.h.in version_defs.h)
 
 # Dependencies
 include(FetchContent)
@@ -76,6 +76,7 @@ add_executable(
 	settings.cpp
 	variant.cpp
 	version.cpp
+	version.rc
 	video.cpp
 	video_settings.cpp
 )

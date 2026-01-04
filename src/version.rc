@@ -1,0 +1,30 @@
+#include <windows.h>
+#include "version_defs.h"
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION ROBIKZINPUTTEST_FILEVERSION
+PRODUCTVERSION ROBIKZINPUTTEST_PRODUCTVERSION
+FILETYPE VFT_APP
+{
+	BLOCK "StringFileInfo"
+	{
+		BLOCK "040904E4"
+		{
+			VALUE "CompanyName", "com.github.zalewa"
+			VALUE "FileVersion", ROBIKZINPUTTEST_FILEVERSION_STRING
+			VALUE "FileDescription", "Robikz's Input Test"
+			VALUE "InternalName", "robikzinputtest"
+			VALUE "LegalCopyright", "com.github.zalewa 2025 - 2026"
+			VALUE "LegalTrademarks", ""
+			VALUE "OriginalFilename", "robikzinputtest.exe"
+			VALUE "ProductName", "Robikz's Input Test"
+			VALUE "ProductVersion", ROBIKZINPUTTEST_PRODUCTVERSION_STRING
+		}
+	}
+	BLOCK "VarFileInfo"
+	{
+		VALUE "Translation", 0x0409, 0x04E4
+	}
+}
+
+IDI_ICON1 ICON DISCARDABLE "robikzinputtest-win.ico"

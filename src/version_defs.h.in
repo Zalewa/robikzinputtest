@@ -1,0 +1,18 @@
+#ifndef ROBIKZINPUTTEST_VERSIONDEFS_H
+#define ROBIKZINPUTTEST_VERSIONDEFS_H
+
+// This file is configured automatically.
+
+#define ROBIKZINPUTTEST_VERSION_MAJOR @robikzinputtest_VERSION_MAJOR@
+#define ROBIKZINPUTTEST_VERSION_MINOR @robikzinputtest_VERSION_MINOR@
+#define ROBIKZINPUTTEST_VERSION_PATCH @robikzinputtest_VERSION_PATCH@
+#define ROBIKZINPUTTEST_VERSION_NCHANGES @robikzinputtest_VERSION_NCHANGES@
+#define ROBIKZINPUTTEST_VERSION_STRING "@robikzinputtest_VERSION_FULL@"
+
+// For version.rc
+#define ROBIKZINPUTTEST_FILEVERSION @robikzinputtest_VERSION_MAJOR@,@robikzinputtest_VERSION_MINOR@,@robikzinputtest_VERSION_PATCH@,@robikzinputtest_VERSION_NCHANGES@
+#define ROBIKZINPUTTEST_FILEVERSION_STRING "@robikzinputtest_VERSION_FULL@"
+#define ROBIKZINPUTTEST_PRODUCTVERSION @robikzinputtest_VERSION_MAJOR@,@robikzinputtest_VERSION_MINOR@,@robikzinputtest_VERSION_PATCH@,@robikzinputtest_VERSION_NCHANGES@
+#define ROBIKZINPUTTEST_PRODUCTVERSION_STRING "@robikzinputtest_VERSION_FULL@"
+
+#endif

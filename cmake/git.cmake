@@ -13,6 +13,8 @@
 # <prefix>_VERSION_MINOR
 # <prefix>_VERSION_PATCH
 #     The major, minor, and patch version numbers from the latest matching tag
+# <prefix>_VERSION_NCHANGES
+#     Number of changes since the latest matching tag tag.
 # <prefix>_VERSION_SUFFIX
 #     The suffix from `git describe`, e.g. "-dirty" or "-5-gabcdef"
 # <prefix>_VERSION_FULL
@@ -23,6 +25,7 @@ function(git_describe var_prefix tag_prefix)
 	set(${var_prefix}_VERSION_MAJOR 0 PARENT_SCOPE)
 	set(${var_prefix}_VERSION_MINOR 0 PARENT_SCOPE)
 	set(${var_prefix}_VERSION_PATCH 0 PARENT_SCOPE)
+	set(${var_prefix}_VERSION_NCHANGES 0 PARENT_SCOPE)
 	set(${var_prefix}_VERSION_SUFFIX "unknown-version" PARENT_SCOPE)
 	set(${var_prefix}_VERSION_FULL "unknown-version" PARENT_SCOPE)
 
@@ -44,12 +47,18 @@ function(git_describe var_prefix tag_prefix)
 			set(${var_prefix}_VERSION_MINOR ${CMAKE_MATCH_2} PARENT_SCOPE)
 			set(${var_prefix}_VERSION_PATCH ${CMAKE_MATCH_3} PARENT_SCOPE)
 			set(${var_prefix}_VERSION_SUFFIX ${CMAKE_MATCH_4} PARENT_SCOPE)
+			set(VERSION_SUFFIX ${CMAKE_MATCH_4})
 			# ${var_prefix}_VERSION_FULL is like VERSION_DESCRIBE but without the tag prefix
 			set(${var_prefix}_VERSION_FULL
 				"${CMAKE_MATCH_1}.${CMAKE_MATCH_2}.${CMAKE_MATCH_3}${CMAKE_MATCH_4}"
 				PARENT_SCOPE)
 			# ${var_prefix}_VERSION_DESCRIBE is the full git describe output without modification
 			set(${var_prefix}_VERSION_DESCRIBE ${GIT_REPO_VERSION} PARENT_SCOPE)
+			# ${var_prefix}_VERSION_NCHANGES contains the number of commits since the tag
+			string(REGEX MATCH "-([0-9]+)-.*" _ "${VERSION_SUFFIX}")
+			if (CMAKE_MATCH_COUNT EQUAL 1)
+				set(${var_prefix}_VERSION_NCHANGES ${CMAKE_MATCH_1} PARENT_SCOPE)
+			endif()
 		else()
 			message(WARNING "Git describe output did not match expected format: ${GIT_REPO_VERSION}")
 		endif()

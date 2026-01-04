@@ -1,5 +1,5 @@
 #include "version.hpp"
-#include "version_defs.hpp"
+#include "version_defs.h"
 
 namespace robikzinputtest {
 
