@@ -24,27 +24,45 @@ The app can be installed by building it from source.
 
 ### Building - Linux
 
-On a Linux platform it should be sufficient to clone the repository and
-`cd` into it, then:
+On a Linux platform it should be sufficient to clone the repository,
+`cd` into it, and then:
 
 ```bash
 mkdir build && cd build
 cmake -DCMAKE_BUILD_TYPE=Release ..
-cmake --build .
+cmake --build . -j `nproc`
 ```
 
 ### Building - Windows
 
 On MS Windows, <https://winlibs.com/> with UCRT runtime and Win64 POSIX threads
-is the suggested compiler. The compiler executables, GNU `make` and CMake should
-be on `%PATH%`. Then the compilation steps should be identical to Linux.
+is the suggested compiler, e.g.:
+
+```
+winlibs-x86_64-posix-seh-gcc-15.2.0-mingw-w64ucrt-13.0.0-r3
+```
+
+The compiler executables, GNU `make` and CMake should be on `%PATH%`. Then the
+compilation steps should be virtually identical to Linux.
+
+After compilation, compiler's runtime and SDL DLLs may need to be copied to
+the `bin/` dir to run the app:
+
+```
+bin/
+  robikzinputtest.exe
+  SDL3.dll
+  libgcc_s_seh-1.dll
+  libstdc++-6.dll
+  libwinpthread-1.dll
+```
 
 ## Usage
 
-After building, the executable will appear in `./src` subdirectory:
+After building, the executable will appear in `./bin` subdirectory:
 
 ```bash
-./src/robikzinputtest
+./bin/robikzinputtest
 ```
 
 The application displays basic usage info upon launch on the help overlay.
