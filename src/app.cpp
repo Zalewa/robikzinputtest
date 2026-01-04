@@ -482,13 +482,17 @@ void App::quit() {
 }
 
 void App::recalculate_fps_clock() {
-	const double reasonably_clamped_target_fps = std::max<double>(10.0, d->settings.target_fps);
-	d->settings.target_fps = reasonably_clamped_target_fps;
-	d->clock.set_resolution(
-		std::chrono::round<std::chrono::nanoseconds>(
-			std::chrono::duration<double>(1.0 / reasonably_clamped_target_fps)
-		)
-	);
+	if (d->settings.limit_fps) {
+		const double reasonably_clamped_target_fps = std::max<double>(10.0, d->settings.target_fps);
+		d->settings.target_fps = reasonably_clamped_target_fps;
+		d->clock.set_resolution(
+			std::chrono::round<std::chrono::nanoseconds>(
+				std::chrono::duration<double>(1.0 / reasonably_clamped_target_fps)
+			)
+		);
+	} else {
+		d->clock.set_resolution(std::chrono::nanoseconds::zero());
+	}
 }
 
 Arena &App::arena() {

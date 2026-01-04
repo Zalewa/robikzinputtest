@@ -81,7 +81,10 @@ std::vector<std::unique_ptr<PropImportExport>> create_settings_prop_map(Settings
 	props.push_back(boolprop("show_settings_at_start", settings.show_settings_at_start));
 	props.push_back(boolprop("show_program_log", settings.show_program_log));
 	props.push_back(boolprop("show_joystick_info", settings.show_joystick_info));
+
+	props.push_back(boolprop("limit_fps", settings.limit_fps));
 	props.push_back(floatprop("target_fps", settings.target_fps));
+
 	props.push_back(intprop("gizmo_width", settings.gizmo_width));
 	props.push_back(intprop("gizmo_height", settings.gizmo_height));
 	props.push_back(intprop("joystick_deadzone", settings.joystick_deadzone));

@@ -301,11 +301,20 @@ void WindowSettings::draw_display_confirmation_popup(const GuiContext &guictx) {
 void WindowSettings::draw_fps_settings(const GuiContext &guictx) {
 	ImGui::Checkbox("Show FPS", &guictx.app.settings().show_fps);
 	ImGui::Checkbox("Show UI frame counter", &guictx.app.settings().show_ui_frame_counter);
+	if (
+		ImGui::Checkbox(
+			"Limit FPS",
+			&guictx.app.settings().limit_fps
+		)
+	) {
+		guictx.app.recalculate_fps_clock();
+	}
+	ImGui::SameLine();
 	ImGui::SetNextItemWidth(80.0f);
 	if (
 		ImGui::DragFloat(
 			"Target FPS", &guictx.app.settings().target_fps,
-			1.0, 10.0f, 10000.0f, "%.3fFPS", ImGuiSliderFlags_Logarithmic | ImGuiSliderFlags_AlwaysClamp
+			1.0, 10.0f, 10000.0f, "%.3fFPS", ImGuiSliderFlags_AlwaysClamp
 		)
 	) {
 		guictx.app.recalculate_fps_clock();

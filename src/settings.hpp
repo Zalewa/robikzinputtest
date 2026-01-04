@@ -19,6 +19,7 @@ struct Settings {
 	bool show_program_log = false;
 	bool show_joystick_info = false;
 
+	bool limit_fps = true;
 	float target_fps = 60.0f;
 
 	int gizmo_width = 50;

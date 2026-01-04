@@ -76,11 +76,13 @@ public:
 	 * since the last tick.
 	 */
 	const FrameTime tick() {
-		// Sleep until the next tick target time.
-		auto target = m_lasttick + m_resolution;
-		auto sleep_time = target - std::chrono::steady_clock::now();
-		if (sleep_time > std::chrono::nanoseconds::zero()) {
-			SDL_DelayPrecise(std::chrono::duration_cast<std::chrono::nanoseconds>(sleep_time).count());
+		if (m_resolution > Duration::zero()) {
+			// Sleep until the next tick target time.
+			auto target = m_lasttick + m_resolution;
+			auto sleep_time = target - std::chrono::steady_clock::now();
+			if (sleep_time > std::chrono::nanoseconds::zero()) {
+				SDL_DelayPrecise(std::chrono::duration_cast<std::chrono::nanoseconds>(sleep_time).count());
+			}
 		}
 
 		// Get the current time and compute the elapsed time since the last tick.
