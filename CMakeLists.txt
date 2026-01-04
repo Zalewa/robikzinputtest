@@ -6,7 +6,7 @@ git_describe(robikzinputtest v)
 project(
 	robikzinputtest
 	VERSION ${robikzinputtest_VERSION_MAJOR}.${robikzinputtest_VERSION_MINOR}.${robikzinputtest_VERSION_PATCH}
-	DESCRIPTION "Robikz's Input Tester"
+	DESCRIPTION "Robikz's Input Test"
 )
 
 add_subdirectory(src)
