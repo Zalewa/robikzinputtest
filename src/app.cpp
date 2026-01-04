@@ -227,13 +227,6 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 		}
 	};
 
-#define RBKZIT_LOG_JOYSTICK_AXIS 0
-#define RBKZIT_LOG_JOYSTICK_BALL 0
-#define RBKZIT_LOG_JOYSTICK_BUTTON 0
-#define RBKZIT_LOG_JOYSTICK_ADDED_REMOVED 1
-#define RBKZIT_LOG_JOYSTICK_UPDATE_COMPLETE 0
-#define RBKZIT_LOG_JOYSTICK_HAT 0
-
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
 		// Pass the events to ImGUI first
@@ -287,19 +280,6 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 			break;
 		case SDL_EVENT_JOYSTICK_ADDED:
 		case SDL_EVENT_JOYSTICK_REMOVED:
-#if RBKZIT_LOG_JOYSTICK_ADDED_REMOVED
-			std::cerr <<
-				(
-					event.jdevice.type == SDL_EVENT_JOYSTICK_ADDED
-					? "SDL_EVENT_JOYSTICK_ADDED "
-					: "SDL_EVENT_JOYSTICK_REMOVED "
-				)
-				<< "timestamp=" << event.jdevice.timestamp << ", "
-				<< "type=" << event.jdevice.type << ", "
-				<< "which=" << event.jdevice.which << ", "
-				<< "reserved=" << event.jdevice.reserved
-				<< std::endl;
-#endif
 			d->logger.info() <<
 				(
 					event.jdevice.type == SDL_EVENT_JOYSTICK_ADDED
@@ -324,79 +304,54 @@ AppRunResult App::handleEvents(const FrameTime &frame_time)
 				d->joysticks.erase(event.jdevice.which);
 			}
 			break;
-		case SDL_EVENT_JOYSTICK_UPDATE_COMPLETE:
-#if RBKZIT_LOG_JOYSTICK_UPDATE_COMPLETE
-			std::cerr << "SDL_EVENT_JOYSTICK_UPDATE_COMPLETE "
-				<< "timestamp=" << event.jdevice.timestamp << ", "
-				<< "type=" << event.jdevice.type << ", "
-				<< "which=" << event.jdevice.which << ", "
-				<< "reserved=" << event.jdevice.reserved
-				<< std::endl;
-#endif
-			break;
 		case SDL_EVENT_JOYSTICK_AXIS_MOTION: {
-#if RBKZIT_LOG_JOYSTICK_AXIS
-			std::cerr << "SDL_EVENT_JOYSTICK_AXIS_MOTION "
-				<< "timestamp=" << event.jaxis.timestamp << ", "
-				<< "which=" << event.jaxis.which << ", "
-				<< "axis=" << static_cast<int32_t>(event.jaxis.axis) << ", "
-				<< "value=" << event.jaxis.value
-				<< std::endl;
-#endif
-			d->logger.info() <<
-				"JOYSTICK_AXIS_MOTION "
-				<< "timestamp=" << event.jaxis.timestamp << ", "
-				<< "which=" << event.jaxis.which << ", "
-				<< "axis=" << static_cast<int32_t>(event.jaxis.axis) << ", "
-				<< "value=" << event.jaxis.value
-				<< std::endl;
+			if (d->settings.log_joystick_axis_events) {
+				d->logger.info()
+					<< "JOYSTICK_AXIS_MOTION "
+					<< "timestamp=" << event.jaxis.timestamp << ", "
+					<< "which=" << event.jaxis.which << ", "
+					<< "axis=" << static_cast<int32_t>(event.jaxis.axis) << ", "
+					<< "value=" << event.jaxis.value
+					<< std::endl;
+			}
 			break;
 		}
-		case SDL_EVENT_JOYSTICK_BALL_MOTION:
-#if RBKZIT_LOG_JOYSTICK_BALL
-			std::cerr << "SDL_EVENT_JOYSTICK_BALL_MOTION"<< std::endl;
-#endif
-			break;
-		case SDL_EVENT_JOYSTICK_HAT_MOTION:
-#if RBKZIT_LOG_JOYSTICK_HAT
-			std::cerr << "SDL_EVENT_JOYSTICK_HAT_MOTION" << std::endl;
-#endif
-			break;
 		case SDL_EVENT_JOYSTICK_BUTTON_DOWN:
-#if RBKZIT_LOG_JOYSTICK_BUTTON
-			std::cerr << "SDL_EVENT_JOYSTICK_BUTTON_DOWN "
-				<< "timestamp=" << event.jbutton.timestamp << ", "
-				<< "button=" << static_cast<int32_t>(event.jbutton.button) << ", "
-				<< "down=" << static_cast<int32_t>(event.jbutton.down)
-				<< std::endl;
-#endif
-			d->logger.info() <<
-				"JOYSTICK_BUTTON_DOWN "
-				<< "timestamp=" << event.jaxis.timestamp << ", "
-				<< "which=" << event.jaxis.which << ", "
-				<< "button=" << static_cast<int32_t>(event.jbutton.button) << ", "
-				<< "down=" << static_cast<int32_t>(event.jbutton.down)
-				<< std::endl;
+			if (d->settings.log_joystick_button_events) {
+				d->logger.info()
+					<< "JOYSTICK_BUTTON_DOWN "
+					<< "timestamp=" << event.jaxis.timestamp << ", "
+					<< "which=" << event.jaxis.which << ", "
+					<< "button=" << static_cast<int32_t>(event.jbutton.button) << ", "
+					<< "down=" << static_cast<int32_t>(event.jbutton.down)
+					<< std::endl;
+			}
 			if (is_joystick_gizmo_create_key(event.jbutton)) {
 				Controller &controller = d->controller_system->for_joystick(event.jbutton.which);
 				spawn_controller_gizmo(controller);
 			}
 			break;
 		case SDL_EVENT_JOYSTICK_BUTTON_UP:
-#if RBKZIT_LOG_JOYSTICK_BUTTON
-			std::cerr << "SDL_EVENT_JOYSTICK_BUTTON_UP "
-				<< "timestamp=" << event.jbutton.timestamp << ", "
-				<< "button=" << static_cast<int32_t>(event.jbutton.button) << ", "
-				<< "down=" << static_cast<int32_t>(event.jbutton.down)
-				<< std::endl;
-#endif
-			d->logger.info() <<
-				"JOYSTICK_BUTTON_UP "
-				<< "timestamp=" << event.jaxis.timestamp << ", "
-				<< "which=" << event.jaxis.which << ", "
-				<< "button=" << static_cast<int32_t>(event.jbutton.button) << ", "
-				<< "down=" << static_cast<int32_t>(event.jbutton.down)
-				<< std::endl;
+			if (d->settings.log_joystick_button_events) {
+				d->logger.info()
+					<< "JOYSTICK_BUTTON_UP "
+					<< "timestamp=" << event.jaxis.timestamp << ", "
+					<< "which=" << event.jaxis.which << ", "
+					<< "button=" << static_cast<int32_t>(event.jbutton.button) << ", "
+					<< "down=" << static_cast<int32_t>(event.jbutton.down)
+					<< std::endl;
+			}
+			break;
+		case SDL_EVENT_JOYSTICK_HAT_MOTION:
+			if (d->settings.log_joystick_button_events) {
+				d->logger.info()
+					<< "JOYSTICK_HAT_MOTION "
+					<< "timestamp=" << event.jhat.timestamp << ", "
+					<< "which=" << event.jhat.which << ", "
+					<< "hat=" << static_cast<int32_t>(event.jhat.hat) << ", "
+					<< "value=" << static_cast<int32_t>(event.jhat.value)
+					<< std::endl;
+			}
 			break;
 		}
 		// Now pass the event to controllers

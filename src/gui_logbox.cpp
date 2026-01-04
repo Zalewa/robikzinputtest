@@ -25,12 +25,18 @@ LogBox::LogBox() {
 	m_auto_scroll = true;
 }
 
-void LogBox::draw(Log &log, const char *title, bool *p_open, float *opacity) {
+void LogBox::draw(
+	Log &log,
+	const char *title,
+	bool *p_open,
+	float *opacity,
+	std::function<void()> extra_options_callback
+) {
 	if (opacity != nullptr) {
 		imgui::push_window_opacity(*opacity);
 	}
 	if (ImGui::Begin(title, p_open, ImGuiWindowFlags_NoMove)) {
-		this->draw_body(log, opacity);
+		this->draw_body(log, opacity, extra_options_callback);
 	}
 	ImGui::End();
 	if (opacity != nullptr) {
@@ -38,12 +44,13 @@ void LogBox::draw(Log &log, const char *title, bool *p_open, float *opacity) {
 	}
 }
 
-void LogBox::draw_body(Log &log, float *opacity) {
+void LogBox::draw_body(Log &log, float *opacity, std::function<void()> extra_options_callback) {
 	// Options menu
 	if (ImGui::BeginPopup("Options")) {
 		ImGui::Checkbox("Auto-scroll", &m_auto_scroll);
 		if (opacity != nullptr)
 			ImGui::SliderFloat("Opacity", opacity, 0.0f, 1.0f);
+		extra_options_callback();
 		ImGui::EndPopup();
 	}
 

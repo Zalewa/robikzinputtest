@@ -110,6 +110,10 @@ std::vector<std::unique_ptr<PropImportExport>> create_settings_prop_map(Settings
 	props.push_back(strprop("fullscreen_display_name", settings.fullscreen_display_name));
 	props.push_back(intprop("vsync", settings.vsync));
 
+	// Log settings
+	props.push_back(boolprop("log_joystick_axis_events", settings.log_joystick_axis_events));
+	props.push_back(boolprop("log_joystick_button_events", settings.log_joystick_button_events));
+
 	return props;
 }
 

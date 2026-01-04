@@ -39,6 +39,7 @@ struct Settings {
 	bool background_flash_on_gizmo_action = false;
 	float program_log_opacity = 1.0f;
 
+	// Display settings
 	int display_mode = static_cast<int>(DisplayMode::WINDOWED);
 	int windowed_x = SDL_WINDOWPOS_CENTERED;
 	int windowed_y = SDL_WINDOWPOS_CENTERED;
@@ -53,6 +54,10 @@ struct Settings {
 	float fullscreen_pixel_density = 0.0f;
 	std::string fullscreen_display_name;
 	int vsync = SDL_RENDERER_VSYNC_DISABLED;
+
+	// Log settings
+	bool log_joystick_axis_events = false;
+	bool log_joystick_button_events = false;
 
 	void import_properties(const std::vector<Property> &properties);
 	std::vector<Property> export_properties() const;

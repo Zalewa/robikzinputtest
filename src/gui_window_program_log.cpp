@@ -29,11 +29,24 @@ void WindowProgramLog::draw(const GuiContext &guictx) {
 		{ fixed_width, 0.0f },
 		{ fixed_width, std::numeric_limits<float>::max() }
 	);
+
+	auto extra_options = [&guictx]() {
+		ImGui::Checkbox(
+			"Log joystick axis events",
+			&guictx.app.settings().log_joystick_axis_events
+		);
+		ImGui::Checkbox(
+			"Log joystick button events",
+			&guictx.app.settings().log_joystick_button_events
+		);
+	};
+
 	m_logbox.draw(
 		this->m_log,
 		"Program Log",
 		&guictx.app.settings().show_program_log,
-		&guictx.app.settings().program_log_opacity
+		&guictx.app.settings().program_log_opacity,
+		extra_options
 	);
 }
 
