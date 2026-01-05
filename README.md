@@ -100,7 +100,7 @@ An `.appimage` file should appear in the build directory.
 
 For extra cleaniness, the entire build directory can be recreated for
 each release, but it should be sufficient to redo the steps starting
-with `--target clean`.
+with `cmake -D CMAKE_BUILD_TYPE...`.
 
 ### Packaging for Windows -- ZIP
 
