@@ -132,5 +132,5 @@ The app has been developed and tested on the following platforms:
 
 MIT License. See [LICENSE](LICENSE.txt).
 
-Somefiles may be under a different license, as denoted
+Some files may be under a different license, as denoted
 by [ATTRIBUTION](ATTRIBUTION.md) or file headers.
