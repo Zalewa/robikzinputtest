@@ -53,7 +53,7 @@ function(git_describe var_prefix tag_prefix)
 
 		string(REGEX MATCH "${tag_prefix}([0-9]+)\\.([0-9]+)\\.([0-9]+)(.*)"
 			_ ${GIT_REPO_VERSION})
-		if (CMAKE_MATCH_COUNT EQUAL 4)
+		if (CMAKE_MATCH_COUNT EQUAL 3 OR CMAKE_MATCH_COUNT EQUAL 4)
 			# Extract version components from `git describe` output, stripping
 			# the tag prefix.
 			set(${var_prefix}_VERSION_MAJOR ${CMAKE_MATCH_1} PARENT_SCOPE)
