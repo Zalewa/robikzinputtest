@@ -97,9 +97,9 @@ rm -rf ./AppDir && cmake --build . --target appimage
 
 An `.appimage` file should appear in the build directory.
 
-For extra cleaniness, the build directory can be recreated beforehand, though
-the removal of `./AppDir` prior to running the `appimage` target should be
-enough.
+For extra cleaniness, the entire build directory can be recreated for
+each release, but it should be sufficient to redo the steps starting
+with `--target clean`.
 
 ### Packaging for Windows -- ZIP
 
