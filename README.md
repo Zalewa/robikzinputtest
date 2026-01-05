@@ -92,7 +92,7 @@ Building a clean release package:
 mkdir -p ./build/appimage-release && cd ./build/appimage-release
 cmake -D CMAKE_BUILD_TYPE=Release ../..
 cmake --build . --target clean
-cmake --build . -j `nproc`
+cmake --build . -j32
 rm -rf ./AppDir && cmake --build . --target appimage
 ```
 
