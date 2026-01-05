@@ -83,7 +83,8 @@ Packaging is for a public release.
 ### Packaging for Linux -- AppImage
 
 **NOTE:** Packaging operation should be run on a sufficiently old Linux system
-so that compatibility with older libc versions is maintained.
+so that compatibility with older libc versions is maintained. Refer to the
+[Dockerfile](packaging/linux/Dockerfile).
 
 Building a clean release package:
 
