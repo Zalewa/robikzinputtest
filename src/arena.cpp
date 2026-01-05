@@ -23,6 +23,7 @@ std::shared_ptr<Gizmo> Arena::create_gizmo(const ControllerId &controller) {
 		static_cast<float>(m_app.settings().gizmo_width),
 		static_cast<float>(m_app.settings().gizmo_height),
 	};
+	gizmo->m_speed = m_app.settings().gizmo_speed;
 	m_gizmos_to_load.push(gizmo);
 	m_gizmos.push_back(gizmo);
 	return gizmo;
@@ -60,6 +61,11 @@ void Arena::set_gizmos_width(int px) {
 void Arena::set_gizmos_height(int px) {
 	for (auto &gizmo : m_gizmos)
 		gizmo->m_size.y = static_cast<float>(px);
+}
+
+void Arena::set_gizmos_speed(float speed) {
+	for (auto &gizmo : m_gizmos)
+		gizmo->m_speed = speed;
 }
 
 void Arena::set_bounds(const SDL_Rect &bounds) {

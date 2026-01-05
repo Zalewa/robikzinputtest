@@ -26,6 +26,7 @@ public:
 	const std::vector<std::shared_ptr<Gizmo>> &gizmos() const { return m_gizmos; }
 	void set_gizmos_width(int px);
 	void set_gizmos_height(int px);
+	void set_gizmos_speed(float speed);
 
 	void set_bounds(const SDL_Rect &bounds);
 

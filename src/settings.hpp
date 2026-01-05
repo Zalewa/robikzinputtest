@@ -19,11 +19,15 @@ struct Settings {
 	bool show_program_log = false;
 	bool show_joystick_info = false;
 
+	float program_log_opacity = 1.0f;
+
 	bool limit_fps = true;
 	float target_fps = 60.0f;
 
+	// Arena settings
 	int gizmo_width = 50;
 	int gizmo_height = 50;
+	float gizmo_speed = 200.0f;
 
 	/**
 	 * Value below which the axis motion is not triggered.
@@ -37,7 +41,6 @@ struct Settings {
 	bool background_animate = true;
 	Color background_flash_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 	bool background_flash_on_gizmo_action = false;
-	float program_log_opacity = 1.0f;
 
 	// Display settings
 	int display_mode = static_cast<int>(DisplayMode::WINDOWED);

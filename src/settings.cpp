@@ -82,17 +82,20 @@ std::vector<std::unique_ptr<PropImportExport>> create_settings_prop_map(Settings
 	props.push_back(boolprop("show_program_log", settings.show_program_log));
 	props.push_back(boolprop("show_joystick_info", settings.show_joystick_info));
 
+	props.push_back(floatprop("program_log_opacity", settings.program_log_opacity));
+
 	props.push_back(boolprop("limit_fps", settings.limit_fps));
 	props.push_back(floatprop("target_fps", settings.target_fps));
 
+	// Arena settings
 	props.push_back(intprop("gizmo_width", settings.gizmo_width));
 	props.push_back(intprop("gizmo_height", settings.gizmo_height));
+	props.push_back(floatprop("gizmo_speed", settings.gizmo_speed));
 	props.push_back(intprop("joystick_deadzone", settings.joystick_deadzone));
 	props.push_back(colorprop("background_color", settings.background_color));
 	props.push_back(boolprop("background_animate", settings.background_animate));
 	props.push_back(colorprop("background_flash_color", settings.background_flash_color));
 	props.push_back(boolprop("background_flash_on_gizmo_action", settings.background_flash_on_gizmo_action));
-	props.push_back(floatprop("program_log_opacity", settings.program_log_opacity));
 
 	// Video settings
 	props.push_back(intprop("display_mode", settings.display_mode));

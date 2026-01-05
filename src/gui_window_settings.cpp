@@ -439,6 +439,15 @@ void WindowSettings::draw_gizmo_settings(const GuiContext &guictx) {
 	) {
 		guictx.app.arena().set_gizmos_height(guictx.app.settings().gizmo_height);
 	}
+	ImGui::SetNextItemWidth(60.0f);
+	if (
+		ImGui::DragFloat(
+			"Gizmo speed", &guictx.app.settings().gizmo_speed,
+			1, 1, 10000, "%.0f", ImGuiSliderFlags_AlwaysClamp
+		)
+	) {
+		guictx.app.arena().set_gizmos_speed(guictx.app.settings().gizmo_speed);
+	}
 	// Joystick configuration
 	ImGui::SetNextItemWidth(120.0f);
 	ImGui::DragInt(
