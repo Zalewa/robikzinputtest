@@ -101,7 +101,7 @@ For extra cleaniness, the build directory can be recreated beforehand, though
 the removal of `./AppDir` prior to running the `appimage` target should be
 enough.
 
-## Packaging for Windows -- ZIP
+### Packaging for Windows -- ZIP
 
 From command prompt (PowerShell should also be okay), starting
 at repository's root:
