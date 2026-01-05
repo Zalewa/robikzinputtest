@@ -67,7 +67,7 @@ if(UNIX AND NOT APPLE)
 			appimage
 			COMMAND ${CMAKE_COMMAND} --install . --prefix AppDir/usr --strip
 			COMMAND
-				VERSION=${robikzinputtest_VERSION_FULL}
+				LINUXDEPLOY_OUTPUT_VERSION=${robikzinputtest_VERSION_FULL}
 				${APPIMAGE_LINUXDEPLOY}
 				--appdir AppDir
 				--executable AppDir/usr/bin/robikzinputtest
