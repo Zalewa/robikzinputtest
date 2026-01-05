@@ -1,4 +1,17 @@
-# Extract version information from git tags.
+# git.cmake - Extract version information from git tags.
+#
+# Written in 2025-2026 by Robert "Robikz" Zalewski <zalewapl@gmail.com>
+#
+# To the extent possible under law, the author(s) have dedicated all copyright
+# and related and neighboring rights to this software to the public domain
+# worldwide. This software is distributed without any warranty.
+#
+# You should have received a copy of the CC0 Public Domain Dedication along with
+# this software. If not, see
+# <http://creativecommons.org/publicdomain/zero/1.0/>.
+#
+# SPDX-License-Identifier: CC0-1.0
+# -
 #
 # It expects the git tags to be in the SEMANTIC VERSIONING format with mandatory
 # MAJOR, MINOR and PATCH numbers, even if all are 0, but with optional prefixes
