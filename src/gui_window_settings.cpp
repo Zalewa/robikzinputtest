@@ -31,6 +31,10 @@ static std::string get_resolution_label(const DisplaySettings &display_settings)
 		;
 }
 
+static std::string get_unique_display_name(const DisplayInfo &display_info) {
+	return std::to_string(display_info.id) + ": " + display_info.name;
+}
+
 struct WindowSettings::D {
 	std::unique_ptr<WindowAbout> window_about;
 	std::unique_ptr<WindowResolutionPopup> window_resolution_popup;
@@ -185,11 +189,11 @@ void WindowSettings::draw_display_settings(const GuiContext &guictx) {
 	// Display selection
 	if (d->video_mode_settings.display_mode != DisplayMode::WINDOWED) {
 		const DisplayInfo current_display_info = get_display_info(d->video_mode_settings.display_id);
-		if (ImGui::BeginCombo("Display", current_display_info.name.c_str())) {
+		if (ImGui::BeginCombo("Display", get_unique_display_name(current_display_info).c_str())) {
 			std::vector<DisplayInfo> displays_info = get_available_displays_info();
 			for (const auto &display_info : displays_info) {
 				const bool is_selected = (display_info.id == current_display_info.id);
-				if (ImGui::Selectable(display_info.name.c_str(), is_selected)) {
+				if (ImGui::Selectable(get_unique_display_name(display_info).c_str(), is_selected)) {
 					d->video_mode_settings.display_id = display_info.id;
 					if (!is_selected && d->video_mode_settings.display_mode == DisplayMode::FULLSCREEN) {
 						// When changing display in fullscreen mode, pick the best available mode
@@ -242,7 +246,7 @@ void WindowSettings::draw_display_settings(const GuiContext &guictx) {
 			const DisplayInfo display_info = get_display_info(new_video_mode_settings.display_id);
 			guictx.app.logger().info() << "Changing display mode to " << display_mode_label << std::endl;
 			if (new_video_mode_settings.display_id != factual_video_mode_settings.display_id) {
-				guictx.app.logger().info() << "Changing display to " << display_info.name << std::endl;
+				guictx.app.logger().info() << "Changing display to " << get_unique_display_name(display_info) << std::endl;
 			}
 			if (new_video_mode_settings.display_settings != factual_video_mode_settings.display_settings) {
 				guictx.app.logger().info() << "Changing resolution to "

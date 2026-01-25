@@ -1,5 +1,8 @@
 #include "variant.hpp"
 
+#include "video.hpp"
+#include "video_settings.hpp"
+
 #include <algorithm>
 
 namespace robikzinputtest {
@@ -35,6 +38,21 @@ float Variant::as_float() const {
 
 double Variant::as_double() const {
 	return std::strtod(this->m_value.c_str(), nullptr);
+}
+
+/*
+  DisplayIdMemo
+*/
+
+Variant::Variant(const DisplayIdMemo &display_id_memo) :
+	m_value(encode_display_id_memo(display_id_memo)) {}
+
+Variant::operator DisplayIdMemo() const {
+	return as_display_id_memo();
+}
+
+DisplayIdMemo Variant::as_display_id_memo() const {
+	return decode_display_id_memo(this->m_value);
 }
 
 } // namespace robikzinputtest

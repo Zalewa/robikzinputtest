@@ -2,6 +2,7 @@
 
 #include <SDL3/SDL.h>
 
+#include <algorithm>
 #include <string>
 
 namespace robikzinputtest {
@@ -35,6 +36,57 @@ SDL_DisplayID get_display_id_by_name(const std::string &display_name) {
 	}
 	SDL_free(displays);
 	return found_display_id;
+}
+
+SDL_DisplayID get_display_id_by_memo(const DisplayIdMemo &display_id_memo) {
+	// List all displays.
+	int num_displays = 0;
+	SDL_DisplayID *displays = SDL_GetDisplays(&num_displays);
+	if (displays == nullptr) {
+		return SDL_GetPrimaryDisplay();
+	}
+
+	std::vector<DisplayIdMemo> all_displays;
+	for (int i = 0; i < num_displays; ++i) {
+		DisplayInfo info = get_display_info(displays[i]);
+		all_displays.push_back(info.to_memo()) ;
+	}
+	SDL_free(displays);
+
+	// Filter displays by matching name.
+	std::vector<DisplayIdMemo> matching_name_displays;
+	std::copy_if(
+		all_displays.begin(),
+		all_displays.end(),
+		std::back_inserter(matching_name_displays),
+		[&](const DisplayIdMemo &memo) {
+			return memo.name == display_id_memo.name;
+		}
+	);
+
+	// If there are multiple displays, try to match by ID.
+	if (matching_name_displays.size() > 1) {
+		auto it = std::find_if(
+			matching_name_displays.begin(),
+			matching_name_displays.end(),
+			[&](const DisplayIdMemo &memo) {
+				return memo.id == display_id_memo.id;
+			}
+		);
+		if (it != matching_name_displays.end()) {
+			// Found. Done.
+			return it->id;
+		}
+	}
+
+	if (!matching_name_displays.empty()) {
+		// If a display with matching ID was not found, or there
+		// is only one display, return it.
+		return matching_name_displays[0].id;
+	} else {
+		// Fallback to primary display.
+		return SDL_GetPrimaryDisplay();
+	}
 }
 
 std::vector<DisplayInfo> get_available_displays_info() {

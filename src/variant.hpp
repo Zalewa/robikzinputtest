@@ -1,6 +1,7 @@
 #pragma once
 
 #include "color.hpp"
+#include "video_defs.hpp"
 
 #include <string>
 
@@ -16,6 +17,7 @@ public:
 	Variant(uint32_t i) : m_value(std::to_string(i)) {}
 	Variant(int64_t i) : m_value(std::to_string(i)) {}
 	Variant(double d) : m_value(std::to_string(d)) {}
+	Variant(const DisplayIdMemo &display_id_memo);
 
 	operator std::string() const { return as_string(); }
 	operator Color() const { return as_color(); }
@@ -25,6 +27,7 @@ public:
 	operator int64_t() const { return as_int64(); }
 	operator float() const { return as_float(); }
 	operator double() const { return as_double(); }
+	operator DisplayIdMemo() const;
 
 	const std::string &as_string() const { return m_value; }
 	bool as_bool() const;
@@ -34,6 +37,7 @@ public:
 	int64_t as_int64() const;
 	float as_float() const;
 	double as_double() const;
+	DisplayIdMemo as_display_id_memo() const;
 
 	bool valid() const { return m_valid; }
 

@@ -72,6 +72,10 @@ static std::unique_ptr<PropRef<std::string>> strprop(const std::string &name, st
 	return std::make_unique<PropRef<std::string>>(name, ref);
 }
 
+static std::unique_ptr<PropRef<DisplayIdMemo>> displayidmemoprop(const std::string &name, DisplayIdMemo &ref) {
+	return std::make_unique<PropRef<DisplayIdMemo>>(name, ref);
+}
+
 std::vector<std::unique_ptr<PropImportExport>> create_settings_prop_map(Settings &settings) {
 	std::vector<std::unique_ptr<PropImportExport>> props;
 	props.push_back(boolprop("show_fps", settings.show_fps));
@@ -110,7 +114,7 @@ std::vector<std::unique_ptr<PropImportExport>> create_settings_prop_map(Settings
 	props.push_back(intprop("fullscreen_refresh_rate_denominator", settings.fullscreen_refresh_rate_denominator));
 	props.push_back(uint32prop("fullscreen_pixel_format", settings.fullscreen_pixel_format));
 	props.push_back(floatprop("fullscreen_pixel_density", settings.fullscreen_pixel_density));
-	props.push_back(strprop("fullscreen_display_name", settings.fullscreen_display_name));
+	props.push_back(displayidmemoprop("fullscreen_display", settings.fullscreen_display));
 	props.push_back(intprop("vsync", settings.vsync));
 
 	// Log settings

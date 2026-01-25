@@ -1,5 +1,7 @@
 #pragma once
 
+#include "video_defs.hpp"
+
 #include <SDL3/SDL.h>
 
 #include <string>
@@ -16,6 +18,10 @@ enum class DisplayMode : int {
 struct DisplayInfo {
 	SDL_DisplayID id;
 	std::string name;
+
+	DisplayIdMemo to_memo() const {
+		return *this;
+	}
 };
 
 struct DisplaySettings {
@@ -69,6 +75,36 @@ struct VideoModeSettings {
 
 DisplayInfo get_display_info(SDL_DisplayID display_id);
 SDL_DisplayID get_display_id_by_name(const std::string &display_name);
+
+/**
+ * Find the best-matching currently available display ID from DisplayIdMemo.
+ *
+ * Its purpose is to find, from among the currently available displays,
+ * the same display that was previously memorized.
+ *
+ * This function operates on heuristics as it's expected that the memo
+ * might become stale and lose accuracy over time (e.g., diplays get
+ * disconnected/reconnected). It makes the best effort to retrieve the
+ * display:
+ *
+ * 1. Display is matched by name primarily. If the ID of the display changes,
+ *    but the name remains the same, the ID for the display with the matching
+ *    name is returned.
+ *
+ * 2. If multiple displays are found with the same name, the ID from the memo
+ *    is used to disambiguate. However, if the ID is not found among the displays,
+ *    the first display with the matching name is returned.
+ *
+ * 3. If no display with the matching name is found, the primary display is used.
+ *
+ * 4. If no displays are found at all, 0 is returned.
+ *
+ * @return
+ *     Best-effort SDL_DisplayID that matches the memo, or 0 if no displays
+ *     are found.
+ */
+SDL_DisplayID get_display_id_by_memo(const DisplayIdMemo &display_id_memo);
+
 std::vector<DisplayInfo> get_available_displays_info();
 std::vector<VideoModeSettings> get_available_display_modes(SDL_DisplayID display_id);
 

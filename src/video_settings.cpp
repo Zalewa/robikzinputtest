@@ -5,6 +5,30 @@
 
 namespace robikzinputtest {
 
+std::string encode_display_id_memo(const DisplayIdMemo &display_id_memo) {
+	return std::to_string(display_id_memo.id) + "|" + display_id_memo.name;
+}
+
+DisplayIdMemo decode_display_id_memo(const std::string &encoded_display_id_memo) {
+	DisplayIdMemo decoded_display_id_memo = {
+		// SDL functions such as SDL_GetPrimaryDisplay() return 0 when
+		// display cannot be established.
+		0,
+		"Unknown Display",
+	};
+	const size_t separator_pos = encoded_display_id_memo.find('|');
+	if (separator_pos == std::string::npos) {
+		return decoded_display_id_memo;
+	}
+	const SDL_DisplayID display_id = static_cast<SDL_DisplayID>(
+		std::stoll(encoded_display_id_memo.substr(0, separator_pos))
+	);
+	const std::string display_name = encoded_display_id_memo.substr(separator_pos + 1);
+	decoded_display_id_memo.id = display_id;
+	decoded_display_id_memo.name = display_name;
+	return decoded_display_id_memo;
+}
+
 void save_window_video_settings(Settings &settings, SDL_Window *window) {
 	DisplayMode display_mode = get_window_display_mode(window);
 	settings.display_mode = static_cast<int>(display_mode);
@@ -31,16 +55,16 @@ void save_window_video_settings(Settings &settings, SDL_Window *window) {
 			settings.fullscreen_refresh_rate_denominator = fullscreen_mode->refresh_rate_denominator;
 			settings.fullscreen_pixel_format = fullscreen_mode->format;
 			settings.fullscreen_pixel_density = fullscreen_mode->pixel_density;
-			settings.fullscreen_display_name = get_display_info(
+			settings.fullscreen_display = get_display_info(
 				SDL_GetDisplayForWindow(window)
-			).name;
+			).to_memo();
 		}
 		break;
 	}
 	case DisplayMode::BORDERLESS_FULLSCREEN:
-		settings.fullscreen_display_name = get_display_info(
+		settings.fullscreen_display = get_display_info(
 			SDL_GetDisplayForWindow(window)
-		).name;
+		).to_memo();
 		break;
 	default:
 		// no extra info to save
@@ -67,10 +91,10 @@ void load_window_video_settings(const Settings &settings, SDL_Window *window) {
 		video_mode_settings.display_settings.refresh_rate_denominator = settings.fullscreen_refresh_rate_denominator;
 		video_mode_settings.display_settings.pixel_format = static_cast<SDL_PixelFormat>(settings.fullscreen_pixel_format);
 		video_mode_settings.display_settings.pixel_density = settings.fullscreen_pixel_density;
-		video_mode_settings.display_id = get_display_id_by_name(settings.fullscreen_display_name);
+		video_mode_settings.display_id = get_display_id_by_memo(settings.fullscreen_display);
 		break;
 	case DisplayMode::BORDERLESS_FULLSCREEN:
-		video_mode_settings.display_id = get_display_id_by_name(settings.fullscreen_display_name);
+		video_mode_settings.display_id = get_display_id_by_memo(settings.fullscreen_display);
 		break;
 	default:
 		// no extra info to load
